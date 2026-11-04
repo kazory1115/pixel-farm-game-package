@@ -15,7 +15,7 @@
     const tools = PixelFarm.createTools({ config, store, audio });
     const animals = PixelFarm.createAnimals({ config, store, world });
     const commerce = PixelFarm.createCommerce({ config, store, world, audio, dialogue, goals });
-    const player = PixelFarm.createPlayer({ config, store, world, commerce, audio, dialogue, goals });
+    const player = PixelFarm.createPlayer({ config, store, world, animals, commerce, audio, dialogue, goals });
     const day = PixelFarm.createDayCycle({ config, store, animals, audio, dialogue, goals, document, setTimeout: window.setTimeout.bind(window) });
     const farming = PixelFarm.createFarming({ config, store, world, commerce, day, audio, dialogue, goals });
     const menu = PixelFarm.createMenu({ config, store, tools, day, audio, goals, window, document });
@@ -35,8 +35,8 @@
       lastTime = now;
       input.update(dt);
       if (!store.sleeping) {
-        if (store.menu.open || store.shop.open || store.market.open) { /* 世界暫停 */ }
-        else if (store.dialogue.active) dialogue.updateDialog(dt);
+        if (store.menu.open || store.shop.open || store.market.open) { player.cancelPendingStep(); }
+        else if (store.dialogue.active){ player.cancelPendingStep(); dialogue.updateDialog(dt); }
         else {
           player.updatePlayer(dt);
           if (store.scene === 'farm') animals.updateAnimals(dt);

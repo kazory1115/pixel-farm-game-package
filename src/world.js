@@ -20,6 +20,7 @@
     function isStall(c, r){ return config.STALLS.some(function(s){ return s.c === c && s.r === r; }); }
     function isTree(c, r){ return config.TREES.some(function(t){ return t.c === c && t.r === r; }); }
     function isPath(c, r){
+      if (r === config.PEN.gate.r && c >= config.PEN.gate.c - 1 && c <= config.PEN.gate.c + 1) return true;
       if (r === 5 && c >= 1 && c <= 12) return true;   /* 橫向石板路 */
       if (c === 10 && r >= 5 && r <= 10) return true;  /* 縱向石板路 */
       if (c === 3 && r === 4) return true;             /* 門前 */
@@ -52,8 +53,32 @@
       return false;
     }
     function solidAt(c, r){ return store.scene === 'shop' ? isSolidShop(c, r) : isSolid(c, r); }
+    function segmentDistance(x, y, x0, y0, x1, y1){
+      var dx = x1 - x0, dy = y1 - y0;
+      var length2 = dx * dx + dy * dy;
+      var t = length2 ? Math.max(0, Math.min(1, ((x - x0) * dx + (y - y0) * dy) / length2)) : 0;
+      return Math.hypot(x - x0 - t * dx, y - y0 - t * dy);
+    }
+    function animalRadius(a){ return a.kind === 'cow' ? 6 : 4; }
+    function animalOnStep(a, c, r){
+      if (a.zone === 'pond') return false;
+      var x0 = store.player.px + 8, y0 = store.player.py + 8;
+      var x1 = c * config.TILE + 8, y1 = r * config.TILE + 8;
+      var radius = animalRadius(a) + 4;
+      // An old overlapping save must still let the player step away.
+      if (Math.hypot(a.x - x0, a.y - y0) < radius && (x0 - a.x) * (x1 - x0) + (y0 - a.y) * (y1 - y0) >= 0) return false;
+      return segmentDistance(a.x, a.y, x0, y0, x1, y1) < radius;
+    }
+    function animalBlocksStep(c, r){
+      if (store.scene !== 'farm') return false;
+      return store.animals.some(function(a){ return animalOnStep(a,c,r); });
+    }
+    function overlapsPlayer(x, y, radius){
+      return store.scene === 'farm' && segmentDistance(x, y, store.player.px + 8, store.player.py + 8,
+        store.player.tx * config.TILE + 8, store.player.ty * config.TILE + 8) < radius + 4;
+    }
     function hash2(c, r){ var x = Math.sin(c * 127.1 + r * 311.7) * 43758.5453; return x - Math.floor(x); }
 
-    return { isPlot, isPond, isFence, isHouse, isShop, isStall, isTree, isPath, isSand, isSolid, isSolidShop, solidAt, hash2 };
+    return { isPlot, isPond, isFence, isHouse, isShop, isStall, isTree, isPath, isSand, isSolid, isSolidShop, solidAt, segmentDistance, animalRadius, animalOnStep, animalBlocksStep, overlapsPlayer, hash2 };
   };
 })(window.PixelFarm);

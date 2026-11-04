@@ -11,7 +11,7 @@ function dialogueLines(api) {
   const view = api.view();
   return api.calls.filter(call => call[0] === 'game' && call[1] === 'fillText'
     && call[3] === 10 * view.scaleX
-    && [view.height - 28, view.height - 15].some(y => call[4] === y * view.scaleY))
+    && [36, 49].some(y => call[4] === y * view.scaleY))
     .map(call => call[2]).join('');
 }
 
@@ -197,9 +197,10 @@ export function registerInteractionTests(format, options) {
     pointer(api,'pointercancel',x,G.Y+23);
     pointer(api,'pointerup',x,G.Y+23);
     assert.equal(api.get('state').tool,'hoe');
-    pointer(api,'pointerdown',x,G.Y+23);
+    const secondRow=G.Y+18+api.game.panels.menuRowHeight()+5;
+    pointer(api,'pointerdown',x,secondRow);
     assert.equal(api.get('menu').open,true,'touch activation waits for release');
-    pointer(api,'pointerup',x,G.Y+23);
+    pointer(api,'pointerup',x,secondRow);
     assert.equal(api.get('state').tool,'can');
     assert.equal(api.get('menu').open,false);
   });
@@ -273,9 +274,11 @@ export function registerInteractionTests(format, options) {
 
   check('directions and A still operate only on the faced tile', api => {
     api.call('pressB');
+    api.get('player').dir='left';
     api.emit('window','keydown',{key:'ArrowLeft'}); api.tick();
     api.emit('window','keyup',{key:'ArrowLeft'}); api.tick(25);
     assert.equal(api.get('player').tx,4);
+    api.get('player').dir='down';
     api.emit('dpad-down','pointerdown'); api.tick();
     api.emit('dpad-down','pointerup'); api.tick(25);
     assert.equal(api.get('player').ty,7);

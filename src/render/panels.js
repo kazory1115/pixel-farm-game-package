@@ -35,7 +35,8 @@
     }
 
     function drawDialog(){
-      var W = view.width - 8, Y = view.height - 44;
+      // The lower corners belong to the touch controls at every button size.
+      var W = view.width - 8, Y = 20;
       panel(4, Y, W, 40);
       surface.ctx.font = '9px "PingFang TC","Microsoft JhengHei",sans-serif';
       var page = dialogue.currentPage();
@@ -58,23 +59,29 @@
         else surface.txt(config.MENU_TABS[i], tx0 + tabW / 2, Y + 12, '#28283c', 'center');
       }
       var items = menu.menuItems();
-      var VIS = Math.max(1, Math.floor((H - 28) / 12));
+      var rowH = menuRowHeight();
+      var VIS = Math.max(1, Math.floor((H - 28) / rowH));
       if (store.menu.idx < store.menu.top) store.menu.top = store.menu.idx;
       if (store.menu.idx >= store.menu.top + VIS) store.menu.top = store.menu.idx - VIS + 1;
       if (store.menu.top > Math.max(0, items.length - VIS)) store.menu.top = Math.max(0, items.length - VIS);
       items.slice(store.menu.top, store.menu.top + VIS).forEach(function(it, j){
         var i = store.menu.top + j;
-        var ry = Y + 18 + j * 12, base = ry + 9;
+        var ry = Y + 18 + j * rowH, base = ry + 9;
         if (i === store.menu.idx){
-          surface.px(X + 3, ry, W - 6, 12, '#e3ddc2');
+          surface.px(X + 3, ry, W - 6, rowH, '#e3ddc2');
           surface.txt('▶', X + 6, base, '#28283c');
         }
         surface.txt(it.label, X + 15, base, it.disabled ? '#9a958a' : '#28283c');
         if (it.meta) surface.txt(it.meta, X + W - 6, base, '#6a675a', 'right');
       });
       surface.ctx.font = '8px "PingFang TC","Microsoft JhengHei",sans-serif';
-      surface.txt(store.menu.tab === 3 ? '↑↓ 捲動 · B 關閉 · ←→ 換頁' : 'A 決定 · B 關閉 · ←→ 換頁', X + W / 2, Y + H - 5, '#6a675a', 'center');
+      var hint = items.length > VIS
+        ? '↑↓ 捲動 ' + (store.menu.top + 1) + '–' + Math.min(items.length, store.menu.top + VIS) + '/' + items.length + ' · B 關閉'
+        : 'A 決定 · B 關閉 · ←→ 換頁';
+      surface.txt(hint, X + W / 2, Y + H - 5, '#6a675a', 'center');
     }
+
+    function menuRowHeight(){ return store.menu.tab === 0 ? 11 : 12; }
 
     function drawShopPanel(){
       surface.ctx.fillStyle = 'rgba(16,18,28,.45)'; surface.ctx.fillRect(0, 16, view.width, view.worldHeight);
@@ -115,6 +122,6 @@
       surface.txt(store.market.msg || 'A 賣出 · B 離開 · 價格每天會變', X + W / 2, Y + H - 5, store.market.msg ? '#a4443c' : '#6a675a', 'center');
     }
 
-    return { panel, panelGeom, drawHUD, drawDialog, drawMenu, drawShopPanel, drawMarketPanel };
+    return { panel, panelGeom, menuRowHeight, drawHUD, drawDialog, drawMenu, drawShopPanel, drawMarketPanel };
   };
 })(window.PixelFarm);

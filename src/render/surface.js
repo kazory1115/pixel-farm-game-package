@@ -43,7 +43,13 @@
         size: m ? parseFloat(m[1]) : 9, bold: /bold/.test(ctx.font || '') });
     }
 
-    function flushText(){
+    function flushText(clipWorld){
+      dctx.save();
+      if (clipWorld){
+        dctx.beginPath();
+        dctx.rect(0, 16 * view.scaleY, disp.width, view.worldHeight * view.scaleY);
+        dctx.clip();
+      }
       for (var i = 0; i < textQueue.length; i++){
         var t = textQueue[i];
         dctx.font = (t.bold ? 'bold ' : '') + (t.size * view.scaleY) + 'px ' + fontFamily;
@@ -51,6 +57,15 @@
         dctx.fillText(t.s, t.x * view.scaleX, t.y * view.scaleY);
       }
       textQueue.length = 0;
+      dctx.restore();
+    }
+
+    // Composite each layer before drawing the next one so crisp world text
+    // stays underneath later panels, dimming, and HUD backgrounds.
+    function present(clipWorld){
+      dctx.imageSmoothingEnabled = false;
+      dctx.drawImage(sc, 0, 0, disp.width, disp.height);
+      flushText(clipWorld);
     }
 
     function fitScreen(){
@@ -79,6 +94,6 @@
       view.scaleX = disp.width / view.width; view.scaleY = disp.height / view.height;
     }
 
-    return { drawFit, drawTile, drawTileFlat, px, txt, flushText, fitScreen, setFontFamily, view, ctx, dctx, sceneCanvas: sc, canvas: disp, textQueue };
+    return { drawFit, drawTile, drawTileFlat, px, txt, flushText, present, fitScreen, setFontFamily, view, ctx, dctx, sceneCanvas: sc, canvas: disp, textQueue };
   };
 })(window.PixelFarm);

@@ -8,8 +8,11 @@ import { loadGame, digest } from './runtime.mjs';
 import { scenarios } from './scenarios.mjs';
 import { registerInteractionTests } from './interaction-fixes.mjs';
 import { registerStartupTests } from './startup.mjs';
+import { registerFieldTests } from './field-test-fixes.mjs';
+import { registerSaveAndTurnTests } from './save-and-turn.mjs';
 
 const baseline = JSON.parse(fs.readFileSync(new URL('fixtures/legacy-baseline.json', import.meta.url)));
+const fieldRenders = JSON.parse(fs.readFileSync(new URL('fixtures/field-test-render-baseline.json', import.meta.url)));
 const directory = fs.mkdtempSync(path.join(os.tmpdir(),'pixel-farm-build-'));
 const exported = await build(directory);
 
@@ -26,31 +29,36 @@ for(const [name,scenario] of Object.entries(scenarios)) {
         result[2]=baseline.scenarios[name][2];
       }
       if (name === 'menu tabs scroll sound and actions') {
+        assert.deepEqual(result.slice(0,5).map(c=>c.render),fieldRenders[name]);
+        for(let index=0;index<5;index++) result[index].render=baseline.scenarios[name][index].render;
         const settings = result[4];
         const previous = baseline.scenarios[name][4];
         assert.deepEqual(settings.items[2], { label:'按鈕大小：100%', action:'controlSize' });
         assert.deepEqual(settings.render.view, previous.render.view);
-        assert.equal(settings.render.operations, previous.render.operations + 4);
         settings.items.splice(2, 1);
-        settings.render = previous.render;
       }
       if (name === 'render parity across viewports scenes and overlays') {
-        // The added settings row contributes one highlight and text draw.
-        for (let index=6; index<result.length; index+=11) {
-          const previous=baseline.scenarios[name][index];
-          assert.deepEqual(result[index].view,previous.view);
-          assert.ok([previous.operations, previous.operations+4].includes(result[index].operations));
-          result[index]=previous;
-        }
-        // Only these seven legacy frames intentionally change: the indoor START
-        // menu now renders. Its visible text and behavior are checked separately.
-        for (let index=10; index<result.length; index+=11) {
-          const previous=baseline.scenarios[name][index];
-          assert.deepEqual(result[index].view,previous.view);
-          assert.notEqual(result[index].hash,previous.hash);
-          assert.ok(result[index].operations>previous.operations);
-          result[index]=previous;
-        }
+        assert.deepEqual(result,fieldRenders[name]);
+        return;
+      }
+      if (name === 'keyboard movement collisions and facing' || name === 'animals egg laying pickup and paused world') {
+        // Animal paths deliberately changed to avoid crops, fences and players.
+        // Field tests verify those constraints over 2,400 updates and test both
+        // collision directions. Preserve every other legacy behavior here.
+        const states=name.startsWith('keyboard')?result.checkpoints.map(c=>c.state):result;
+        const previous=name.startsWith('keyboard')?baseline.scenarios[name].checkpoints.map(c=>c.state):baseline.scenarios[name];
+        if(name.startsWith('animals')) assert.deepEqual(states[2].animals,states[1].animals,'menu pauses animal AI');
+        states.forEach((state,i)=>{
+          assert.deepEqual(state.animals.map(a=>[a.kind,a.zone]),previous[i].animals.map(a=>[a.kind,a.zone]));
+          state.animals=previous[i].animals;
+          // Different wandering choices consume random draws differently, so
+          // the number and positions of random eggs can change within the cap.
+          if(name.startsWith('animals')) assert.ok(state.eggs.length<=4);
+          else assert.equal(state.eggs.length,previous[i].eggs.length);
+          assert.equal(new Set(state.eggs.map(e=>`${e.c},${e.r}`)).size,state.eggs.length);
+          for(const egg of state.eggs) assert.ok(egg.c>13 && egg.c<18 && egg.r>3 && egg.r<7);
+          state.eggs=previous[i].eggs;
+        });
       }
       assert.deepEqual(result,baseline.scenarios[name]);
     });
@@ -61,12 +69,16 @@ registerInteractionTests('development', {});
 registerInteractionTests('standalone', { htmlPath:exported });
 registerStartupTests('development', {});
 registerStartupTests('standalone', { htmlPath:exported });
+registerFieldTests('development', {});
+registerFieldTests('standalone', { htmlPath:exported });
+registerSaveAndTurnTests('development', {});
+registerSaveAndTurnTests('standalone', { htmlPath:exported });
 
 test('game markup and image bytes are preserved around the control settings', async () => {
   const runtime=await loadGame();
   assert.ok(runtime.game,'the root entry must boot the game directly');
   assert.doesNotMatch(runtime.html,/<meta[^>]+http-equiv=["']refresh["']|<iframe\b/i);
-  const body=runtime.html.match(/<body>([\s\S]*?)<script/)[1].replace(/<section class="startup"[\s\S]*?<\/section>\n\n/, '').replace('class="padbar" id="padbar"', 'class="padbar"');
+  const body=runtime.html.replace(/\r\n/g,'\n').match(/<body>([\s\S]*?)<script/)[1].replace(/<section class="startup"[\s\S]*?<\/section>\n\n/, '').replace('class="padbar" id="padbar"', 'class="padbar"');
   assert.equal(digest(body),baseline.markupHash);
   const css=fs.readFileSync(path.join(root,'styles/game.css'),'utf8');
   assert.match(css,/--control-unit:min\(/);

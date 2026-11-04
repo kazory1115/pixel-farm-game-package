@@ -97,7 +97,7 @@ export const scenarios = {
     checkpoints.push(api.snapshot());
     api.call('pressB');
     const player=api.get('player');
-    Object.assign(player,{ tx:7, ty:7, px:112, py:112, moving:false });
+    Object.assign(player,{ tx:7, ty:7, px:112, py:112, dir:'down', moving:false });
     api.emit('window','keydown',{key:'ArrowDown'}); api.tick();
     api.emit('window','keyup',{key:'ArrowDown'}); api.tick(25);
     checkpoints.push(api.snapshot());
@@ -127,6 +127,8 @@ export const scenarios = {
     clearDialogue(api);
     const checkpoints=[];
     for(const [key,count] of [['ArrowDown',20],['a',40],['w',60],['d',40],['s',20]]) {
+      // This legacy route tests stepping; turn-in-place is covered separately.
+      api.get('player').dir={ArrowDown:'down',a:'left',w:'up',d:'right',s:'down'}[key];
       api.emit('window','keydown',{key}); api.tick(count);
       api.emit('window','keyup',{key}); api.tick(25);
       checkpoints.push({ state:api.snapshot(), facing:api.call('facedTile') });
@@ -187,7 +189,7 @@ export const scenarios = {
     for(const egg of [...api.get('eggs')]) interact(api,egg.c,egg.r);
     api.call('pressB');
     api.get('eggs').push({c:6,r:6});
-    Object.assign(api.get('player'),{tx:5,ty:6,px:80,py:96,moving:false});
+    Object.assign(api.get('player'),{tx:5,ty:6,px:80,py:96,dir:'right',moving:false});
     api.emit('window','keydown',{key:'ArrowRight'}); api.tick();
     api.emit('window','keyup',{key:'ArrowRight'}); api.tick(25);
     checkpoints.push(api.snapshot());

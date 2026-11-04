@@ -9,13 +9,13 @@
         surface.px(0, 0, view.width, view.height, '#3a2a18'); /* 先鋪滿深木色：室內置中後四周不留殘影/空白 */
         surface.px(0, 0, view.width, 16, '#20242c');
         worldView.drawShopInterior();
+        surface.present(true);
+        surface.ctx.clearRect(0, 0, view.width, view.height);
         panels.drawHUD();
         if (store.menu.open) panels.drawMenu();
         else if (store.shop.open) panels.drawShopPanel();
         else if (store.dialogue.active) panels.drawDialog();
-        surface.dctx.imageSmoothingEnabled = false;
-        surface.dctx.drawImage(surface.sceneCanvas, 0, 0, surface.canvas.width, surface.canvas.height);
-        surface.flushText();
+        surface.present();
         return;
       }
       worldView.computeCam();
@@ -37,8 +37,7 @@
           if (world.isPond(c, r)){ surface.drawTileFlat(images.tile_water, c, r); continue; }
           if (world.isPlot(c, r)){
             var p = store.plotAt(c, r);
-            surface.drawTile(p.tilled ? images.tile_soil : images.tile_dirt, c, r);
-            if (p.tilled && p.watered){ surface.ctx.fillStyle = 'rgba(30,40,90,.22)'; surface.ctx.fillRect(c*config.TILE, r*config.TILE, config.TILE, config.TILE); }
+            worldView.drawPlot(c, r, p);
             continue;
           }
           if (world.isPath(c, r) || (r === 12 && c >= 1 && c <= 8)){ surface.drawTile(images.tile_stone, c, r); continue; } /* 石板路與市集廣場：原本的岩石地板 */
@@ -53,7 +52,10 @@
       for (var r2 = config.PLOT_R0; r2 <= config.PLOT_R1; r2++)
         for (var c2 = config.PLOT_C0; c2 <= config.PLOT_C1; c2++){
           var pp = store.plotAt(c2, r2);
-          if (pp.crop) worldView.drawCropPlant(c2, r2, pp);
+          if (pp.crop){
+            worldView.drawCropPlant(c2, r2, pp);
+            worldView.drawWaterStatus(c2, r2, pp);
+          }
         }
       var f = player.facedTile();
       if (world.isPlot(f.c, f.r) || (f.c === config.DOOR.c && f.r === config.DOOR.r) ||
@@ -104,13 +106,13 @@
       }
       surface.ctx.restore();
       surface.px(0, 16, view.width, view.worldHeight, 'rgba(255,166,66,.05)'); /* 農場整體罩一層暖色，跟商店室內的暖木色調統一 */
+      surface.present(true);
+      surface.ctx.clearRect(0, 0, view.width, view.height);
       panels.drawHUD();
       if (store.menu.open) panels.drawMenu();
       else if (store.market.open) panels.drawMarketPanel();
       else if (store.dialogue.active) panels.drawDialog();
-      surface.dctx.imageSmoothingEnabled = false;
-      surface.dctx.drawImage(surface.sceneCanvas, 0, 0, surface.canvas.width, surface.canvas.height);
-      surface.flushText();
+      surface.present();
     }
 
     return { draw };

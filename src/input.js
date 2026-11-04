@@ -6,6 +6,7 @@
     const el = id => document.getElementById(id);
     let heldNavigation = null;
     let gesture = null;
+    const keyboardDirections = { arrowup:'up', w:'up', arrowdown:'down', s:'down', arrowleft:'left', a:'left', arrowright:'right', d:'right' };
 
     // Keyboard and touch directions share the same modal navigation rules.
     function navigate(direction){
@@ -94,8 +95,9 @@
         var k = e.key.toLowerCase();
         if (['arrowup','arrowdown','arrowleft','arrowright',' '].indexOf(k) >= 0) e.preventDefault();
         store.input.keys[k] = true;
-        const direction = { arrowup:'up', w:'up', arrowdown:'down', s:'down', arrowleft:'left', a:'left', arrowright:'right', d:'right' }[k];
+        const direction = keyboardDirections[k];
         if (direction && navigate(direction)) return;
+        if (direction) player.faceDirection(direction);
         if (store.shop.open){
           if ((k === 'z' || k === ' ' || k === 'e') && !e.repeat){ commerce.shopBuy(); }
           else if (k === 'x' || k === 'escape' || k === 'enter'){ store.shop.open = false; }
@@ -121,7 +123,9 @@
           if (num >= 1 && num <= config.TOOL_CYCLE.length && !store.dialogue.active){ tools.applyToolOpt(config.TOOL_CYCLE[num - 1]); audio.sfx.plant(); }
         }
       });
-      window.addEventListener('keyup', function(e){ store.input.keys[e.key.toLowerCase()] = false; });
+      window.addEventListener('keyup', function(e){
+        var k=e.key.toLowerCase(); store.input.keys[k]=false; player.releaseDirection(keyboardDirections[k]);
+      });
       document.querySelectorAll('.dpad button').forEach(function(b){
         var d = b.getAttribute('data-dir');
         var on = function(e){
@@ -130,10 +134,10 @@
           if (navigate(d)){
             store.input.touchDir = null;
             heldNavigation = { direction:d, elapsed:0, next:0.3 };
-          } else store.input.touchDir = d;
+          } else { player.faceDirection(d); store.input.touchDir = d; }
         };
         var off = function(){
-          if (store.input.touchDir === d) store.input.touchDir = null;
+          if (store.input.touchDir === d){ store.input.touchDir = null; player.releaseDirection(d); }
           if (heldNavigation?.direction === d) heldNavigation = null;
         };
         b.addEventListener('pointerdown', on);
@@ -167,9 +171,10 @@
         if (!store.menu.open || store.menu.tab !== gesture.tab){ gesture = null; return; }
         if (Math.abs(e.clientX - gesture.x) > 10 || Math.abs(e.clientY - gesture.y) > 10) gesture.moved = true;
         if (!gesture.moved) return;
-        const visible = Math.max(1, Math.floor((panels.panelGeom().H - 28) / 12));
+        const rowH = panels.menuRowHeight();
+        const visible = Math.max(1, Math.floor((panels.panelGeom().H - 28) / rowH));
         const maximum = Math.max(0, menu.menuItems().length - visible);
-        const delta = Math.trunc((gesture.gy - point(e).y) / 12);
+        const delta = Math.trunc((gesture.gy - point(e).y) / rowH);
         store.menu.top = Math.max(0, Math.min(maximum, gesture.top + delta));
         store.menu.idx = Math.max(store.menu.top, Math.min(store.menu.idx, store.menu.top + visible - 1));
       });
@@ -188,8 +193,9 @@
       if (gx < X || gx > X + W || gy < Y || gy > Y + H){ store.menu.open = false; return; }
       if (gy < Y + 18){ store.menu.tab = Math.max(0, Math.min(config.MENU_TABS.length - 1, Math.floor((gx - X - 2) / ((W - 4) / config.MENU_TABS.length)))); store.menu.idx = 0; store.menu.top = 0; audio.sfx.cursor(); return; }
       var items = menu.menuItems();
-      var i = store.menu.top + Math.floor((gy - (Y + 18)) / 12);
-      var VIS = Math.max(1, Math.floor((H - 28) / 12));
+      var rowH = panels.menuRowHeight();
+      var i = store.menu.top + Math.floor((gy - (Y + 18)) / rowH);
+      var VIS = Math.max(1, Math.floor((H - 28) / rowH));
       if (i >= store.menu.top && i < Math.min(items.length, store.menu.top + VIS)){ store.menu.idx = i; menu.menuActivate(); }
     }
 

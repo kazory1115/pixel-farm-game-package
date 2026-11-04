@@ -1,0 +1,1236 @@
+{
+  "render parity across viewports scenes and overlays": [
+    {
+      "hash": "dcb2156e7e613be1edcbc5a50b623158ef5a37f20b14df85e7a3db2a350bbf6f",
+      "operations": 694,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "67a498cdfd5eecbf6047e623ecbb8589b9fe6e74b0e79d7a56659a72d67eddab",
+      "operations": 808,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "31aae14c1207ee1fdf0afed09f02c51f220ffbc8f16a7252960cf1fc85ed102b",
+      "operations": 773,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "90e44073c169786736aace53af35d54105657afc70947d29c6a5e4d206a904e9",
+      "operations": 713,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "c39c8ee8d26de31e400b73459f3f714d7907dec72e248857c429848719f06871",
+      "operations": 725,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "f50516e288a51f8f267a57abf6bc175489d3f861fc35313ee95bbc25fecef497",
+      "operations": 741,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "38f0cfc4bd1d0bef2c9c9bca9f44a48123d8b6cc4a84db33af0fe5e24a16c43a",
+      "operations": 725,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "7e4e2fde7d3f3828d52ca1fd03b987ad73c4de3780b24bf6cbefa5f19ec9aac2",
+      "operations": 650,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "78b0622413861f1756e326dacc8e11d89cbd897156840cfbd64512d1820a160f",
+      "operations": 658,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "ed338a1121a5ee224584b30f5a508cdb1b8e53c7d3cee52acc1ec5c7eed5de88",
+      "operations": 719,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "2bc33d288fb9cf3650030c0892e32d096600d72a8ad7c22c7f92a25b26594712",
+      "operations": 737,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "e8c2fc9c3e698886af90686cd4c95c86fa714ed634cbbe34b13b1275c4c66162",
+      "operations": 712,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "852244fd2745b62d1d7e77ce80c22b8a081ca6020f555563c3f8ebbd48a1b6a9",
+      "operations": 826,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "6d95e9c61158502ba67592cdb835bfd830329b22430a461469c2f5587eea5518",
+      "operations": 791,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "be3983af887add23c87f6dde40608c66d89075e02e32ae01c08fabb076a9fa4a",
+      "operations": 779,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "72f82ae49082be3359e24fb4c98113d0666f028bb219537ca16045b18ed1377d",
+      "operations": 743,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "b79b311e158abfdd0d3a9f6a7826c5ae9203dbbddc47922c682c411ac8bd22b8",
+      "operations": 759,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "24f62ee28744605fb7dcb6f9b691b92330368c822642784e762f0e175bb1c3df",
+      "operations": 743,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "2e5bba38e6681f418f0cb4c0ed302e23b6ee17d59505e3b92a97a810e74fb196",
+      "operations": 650,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "b95f2ee96310bdfaf22f7874a8ffde166531313ed437257b06baa35ef42c6fdd",
+      "operations": 658,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "83942e5aea33af3655d7aa57214139aeeaf1d14c6bd49271716b2221ceb42ed1",
+      "operations": 719,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "65606d893d1632ab02b3a706800fa64b4d483880d5ec96c3f02b93547970c462",
+      "operations": 737,
+      "view": {
+        "width": 176,
+        "height": 381,
+        "worldHeight": 365,
+        "scaleX": 4.431818181818182,
+        "scaleY": 4.430446194225722,
+        "camera": {
+          "x": 96,
+          "y": -70.5
+        }
+      }
+    },
+    {
+      "hash": "4d62a8e7ca2165a4f682c998a99e20888a07fe9a0cadb12d618d459a5b08367c",
+      "operations": 666,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "eab9c5904aa9485011bc28e3d4cd8e4579fdaab656e0f0c7bcc431936823aaf8",
+      "operations": 780,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "78350731bb2a5c0b2a1dc0a7516b6eb739f109d03b4e87405493c44b9fcb7a82",
+      "operations": 749,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "a67a981afbb5653311c9613fde85f9970099c61a12762bcb227efcf6d2f7a715",
+      "operations": 737,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "bed2693d20d481c2394ccb43bb23c66c4018f389ec7ec6fe09b8ae9f9181ca51",
+      "operations": 701,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "e323d20cdd4cc3584c65b4cfdda6cdd8c57aaf852640d15944aa8c9714e3fcab",
+      "operations": 717,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "3aaf59b5d8429f60910240f769d1dc772298d1aae8f682cd2561457fcda353b9",
+      "operations": 701,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "de908ca0705b8733a1a9917bcacd41f589bc47448fb68d84159a0dd77cf77e90",
+      "operations": 650,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "7b1feddd7a315ecf2a2d699b015efc4f9e951d9fcf90d6551bc29d26f5ec7c75",
+      "operations": 654,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "acbc80cc2785132e6f09deee19865a053ee2d9e944be51c00212a94bc17d8fd2",
+      "operations": 719,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "272a16c9b30a74780610765a632df340129da028be1093fe99828af166022bf8",
+      "operations": 737,
+      "view": {
+        "width": 336,
+        "height": 155,
+        "worldHeight": 139,
+        "scaleX": 5.023809523809524,
+        "scaleY": 5.032258064516129,
+        "camera": {
+          "x": -8,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "0b6af64252f87db8414597f9493c04430977c5456f1e6b1bcf6f92dcc05b549a",
+      "operations": 694,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "d52e551808363353627c7ca22e05f15346ec085eab4498d0972c1c7732e62b20",
+      "operations": 808,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "f61319ce14ee818ae7bf80e8783cf478ffc68894b87035f1df8e1a15d228feb7",
+      "operations": 773,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "03acd0bc17d20b2fe7fd7d79f1e01430b62bf4e884ec41298c944aa21973b147",
+      "operations": 761,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "59e3c7b5841ee3438a7fbe025a2cfec71f5251e716eeb143ef4d03316f462601",
+      "operations": 725,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "1804eed1d1ed9b74bf7c432c4bb36cfd619b5925bd1b96f082d543909312c7ed",
+      "operations": 741,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "202e9143724d13a9313b9e334ea7713b42c50c3cb398382810ea4780f22ff997",
+      "operations": 725,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "afa1170c5d0b641fdd1d45abb65fce57b6857a53802a3d88b49445ecaa18e3c4",
+      "operations": 650,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "65035a91d3adc6d378c616b9ab88db2ba089ef9b83d8d1ef6748c9fc74fa1cb1",
+      "operations": 658,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "3816c62d3fec5a6a3231d314b9b69563e95f9c4fce9ac0722d5900c074918e52",
+      "operations": 719,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "5b8d01346878578f44ae632fddadd19e4516be681e01cfdef9a4d66c4d79b57a",
+      "operations": 737,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 13.52112676056338,
+        "scaleY": 13.5,
+        "camera": {
+          "x": 36,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "72b71111e7ead93233eaa12bf729d1216d1be1d795d44c560a77dbdfea0e8efc",
+      "operations": 466,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "adf94d96c1e604cb1b3a3e1fbb7356a35bced67e5221aa2b165aff791c51dcff",
+      "operations": 580,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "1035aaef6e19f758d6386127c952a2b0e2a1f4e34dd9901d8756c433f7c7580a",
+      "operations": 501,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "8fb23443074d04aea34971da8032bbb6ad0755635e359f5b81cd7b97bc4cddf2",
+      "operations": 509,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "f7909ac1cf393b873aa4d3b16564bb9e34c870bc5bec64e1e88ee9e5fd01cf3a",
+      "operations": 497,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "b0cbb6beed31b2a962c3dc439c0b77f0f4522c323f1d9064a21274448996eb71",
+      "operations": 497,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "5664b635e46f9c0db2cda940d6cf17ed922d9e4acc2af9ec671831fbf3d4fb72",
+      "operations": 497,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "3e47a6d433d159ef46ca3d5407de10ea37535f6753f9b3e09b9d3ad02235ca69",
+      "operations": 650,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "55db2e8e2119c77fc7214c4966f5a58e8e88aad83cd9c99ecb8c0d5939db32d1",
+      "operations": 654,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "049584a0580738c58ec386086f49e8300db36a9ba85cf1b2e28b7a10975ccaea",
+      "operations": 719,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "fe9914578e15b9db1625e96a9c895dcee55d42edec1027dc6b879c921af6adf2",
+      "operations": 689,
+      "view": {
+        "width": 336,
+        "height": 95,
+        "worldHeight": 79,
+        "scaleX": 7.619047619047619,
+        "scaleY": 7.578947368421052,
+        "camera": {
+          "x": -8,
+          "y": 16.5
+        }
+      }
+    },
+    {
+      "hash": "69a105649ca6ce1f34c35ea2c0dc7f18247f4464cbac4b52366c42fceaafc556",
+      "operations": 535,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "57ab5afd8c95075443db1adc8855634dc97679d90a7c263a38b4ce99dcd2cf51",
+      "operations": 649,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "a3d41f62a84a9ac754f94979dc45cff7444c222f04d470b75905bd7bfa8cddf8",
+      "operations": 614,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "dceeea4fcda95fe58e69a168e655adc2de5046065768497b5c742fed2032c1e4",
+      "operations": 602,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "12ad68e1af06f8688e48333e56669325a219fb9885ad6ee3256e3988b9ec79a6",
+      "operations": 566,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "424aca80ed14b6c13a094045a89dfd62df97ff20528d6a33bf6e679676b70089",
+      "operations": 582,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "bb185b23a92fb96f032bb6e261f0e81ed9c10d4a50c84b4cf2939582283e9af3",
+      "operations": 566,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "8e765c50ee64d25d5ae7912c3c050dc8651b41c84a3e9fde7836121fffd4d435",
+      "operations": 650,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "f285fce50e68b5536455958393235a9723f86656032847fbcc4d8f0c26d55561",
+      "operations": 658,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "47afee72c20e8c99d94225fa58233c0f8fba78a0feb378563ec87fc900f3cedb",
+      "operations": 719,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "6f6fd49f3387b9ac0e48ea7bc28a34cabb9cc6dd20ee93a4fb7b5dd9295d8c1f",
+      "operations": 737,
+      "view": {
+        "width": 107,
+        "height": 400,
+        "worldHeight": 384,
+        "scaleX": 2.9906542056074765,
+        "scaleY": 3,
+        "camera": {
+          "x": 130.5,
+          "y": -80
+        }
+      }
+    },
+    {
+      "hash": "a5b9d978bd3182f21ad7736a9e8fa170a47cb9f85e7b321f15f43f840f604f38",
+      "operations": 518,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "ad881f520833ecf3097bd08b6466399bac598c9cbcad6c19f0d4d538b60c7e44",
+      "operations": 632,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "63a19275b355bceab6f6f747f97a3d9a894e91224123a59c663e0a98b91fb1c0",
+      "operations": 597,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "5a3792c13b9dccb2d71ba685d09e702193d27dbc587d2fff9511e1ca49d136c4",
+      "operations": 585,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "5df45e6582368f1e5483a2d55e349e89adf6be6f63c30bf5636d0cfd9e0d62b7",
+      "operations": 549,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "41879c7decb7cb405babb77e0940eca876a49a4d07f65952a984ca92d5c6237e",
+      "operations": 565,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "970f2e992add8da36944c8e65744e8b0b28aaaa06690ce0b4df314b7875dfb6d",
+      "operations": 549,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "2e218ae418ea12e6a13141fa8bc6d41a13ead0447936386cc5af5b6504f9681d",
+      "operations": 650,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "420c4ecebc87caef96f767c5fe9b08775cfdad3994458e2ef11592db31daa0b5",
+      "operations": 658,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "26ebf8334d35ef9a06617b5facf93c19e6a7b75686377f976db5ffec62d25785",
+      "operations": 719,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    },
+    {
+      "hash": "542790f81852137d632a7cff7240fef4a66b75bfde6a07d87eb6bc5075587e3f",
+      "operations": 737,
+      "view": {
+        "width": 160,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 2,
+        "scaleY": 2,
+        "camera": {
+          "x": 104,
+          "y": 0
+        }
+      }
+    }
+  ],
+  "menu tabs scroll sound and actions": [
+    {
+      "hash": "6d2d6634128ad26afade76a6b6aaa70eca9f481926f9f5650182784f50b86d49",
+      "operations": 846,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 0,
+          "y": 32
+        }
+      }
+    },
+    {
+      "hash": "f74f6b063eabad8076de9dd56c200ae1ea749554a0ccf6ee7249e3908e8ad91f",
+      "operations": 786,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 0,
+          "y": 32
+        }
+      }
+    },
+    {
+      "hash": "eb4faf408f749b207973c0f3638893a409ff3cfa6cc53391318b6f13cb61863f",
+      "operations": 798,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 0,
+          "y": 32
+        }
+      }
+    },
+    {
+      "hash": "769f72cfd892e064efd1c2050519d858674793c8ec006278ca5b8cc402f54ff6",
+      "operations": 814,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 0,
+          "y": 32
+        }
+      }
+    },
+    {
+      "hash": "63c2e1d940964db499f0e198f9e7368002933e01572287eb95c436d03b0cc882",
+      "operations": 798,
+      "view": {
+        "width": 284,
+        "height": 160,
+        "worldHeight": 144,
+        "scaleX": 4.507042253521127,
+        "scaleY": 4.5,
+        "camera": {
+          "x": 0,
+          "y": 32
+        }
+      }
+    }
+  ]
+}

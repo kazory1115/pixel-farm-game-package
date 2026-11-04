@@ -15,18 +15,22 @@
       if (img && img.complete && img.naturalWidth){
         /* 生成素材：木屋＋空白招牌＋門前土堆；門對齊 col 11，底部落在商店列下緣 */
         surface.ctx.drawImage(img, config.SHOP.c0 * config.TILE - 7, config.SHOP.r0 * config.TILE - 3, 62, 53);
-        surface.ctx.font = 'bold 8px "PingFang TC","Microsoft JhengHei",sans-serif';
-        if (!store.menu.open && !store.market.open) surface.txt('商店', config.SHOP.c0 * config.TILE + 24, 28, '#5a3410', 'center');
+        surface.ctx.font = '6px "PingFang TC","Microsoft JhengHei",sans-serif';
+        if (!store.menu.open && !store.market.open) surface.txt('商店', config.SHOP.c0 * config.TILE + 24, 28, '#76543b', 'center');
       }
     }
 
     function drawMarket(){
-      [2, 5].forEach(function(c0){
-        var x = c0 * config.TILE, y = 11 * config.TILE;
+      config.STALLS.filter(function(_, i){ return i % 2 === 0; }).forEach(function(stall){
+        var x = stall.c * config.TILE, y = stall.r * config.TILE;
         surface.px(x + 1, y + 2, 3, 14, '#7a4a21'); surface.px(x + 28, y + 2, 3, 14, '#7a4a21'); /* 柱子 */
-        if (c0 === 2) drawFigure(x + 24, y + 13, '#b03a2e', '#c9862b');          /* 攤販 */
+        if (stall.c === config.STALLS[0].c){
+          surface.ctx.save(); surface.ctx.translate(x + 24, y + 15); surface.ctx.scale(.8, .8);
+          drawFigure(0, 0, '#b03a2e', '#c9862b');
+          surface.ctx.restore();
+        }
         surface.px(x, y + 10, 32, 3, '#a4713a'); surface.px(x, y + 13, 32, 3, '#8a5a2b');        /* 攤台 */
-        for (var i = 0; i < 4; i++) surface.px(x + i * 8, y - 3, 8, 5, i % 2 ? '#f5f0e6' : '#d9534a'); /* 棚布 */
+        for (var i = 0; i < 4; i++) surface.px(x + i * 8, y, 8, 4, i % 2 ? '#f5f0e6' : '#d9534a'); /* 棚布留在攤位格內 */
       });
       surface.drawFit(images.item_wheat, 2 * config.TILE + 8, 11 * config.TILE + 11, 10);
       surface.drawFit(images.item_tomato, 5 * config.TILE + 8, 11 * config.TILE + 11, 10);
@@ -34,9 +38,9 @@
       /* 行情招牌 */
       var sx = config.SIGN.c * config.TILE, sy = config.SIGN.r * config.TILE;
       surface.px(sx + 7, sy + 4, 2, 12, '#7a4a21');
-      surface.px(sx - 2, sy - 4, 20, 10, '#7a4a21');
-      surface.ctx.font = 'bold 8px "PingFang TC","Microsoft JhengHei",sans-serif';
-      if (!store.menu.open && !store.market.open) surface.txt('市集', sx + 8, sy + 3, '#ffe9a8', 'center');
+      surface.px(sx, sy - 4, 18, 10, '#7a4a21');
+      surface.ctx.font = '6px "PingFang TC","Microsoft JhengHei",sans-serif';
+      if (!store.menu.open && !store.market.open) surface.txt('市集', sx + 9, sy + 3, '#c9ab78', 'center');
     }
 
     function drawShopInterior(){
@@ -56,8 +60,8 @@
       /* 貨架（生成素材，左右各一座靠牆） */
       surface.drawFit(images.shop_shelf, 40, 48, 40);
       surface.drawFit(images.shop_shelf, 200, 48, 40);
-      surface.ctx.font = 'bold 9px "PingFang TC","Microsoft JhengHei",sans-serif';
-      if (!store.menu.open) surface.txt('種 子 商 店', 120, 13, '#ffe9a8', 'center');
+      surface.ctx.font = '7px "PingFang TC","Microsoft JhengHei",sans-serif';
+      if (!store.menu.open) surface.txt('種 子 商 店', 120, 13, '#c8a776', 'center');
       /* 地毯 */
       surface.px(6 * config.TILE + 2, 5 * config.TILE + 2, 3 * config.TILE - 4, 2 * config.TILE - 4, '#a4443c');
       surface.px(6 * config.TILE + 6, 5 * config.TILE + 6, 3 * config.TILE - 12, 2 * config.TILE - 12, '#c05a4a');
@@ -76,7 +80,8 @@
       /* 出口門 */
       surface.px(7 * config.TILE - 2, 8 * config.TILE, 20, 16, '#5f3a18');
       surface.px(7 * config.TILE + 2, 8 * config.TILE + 3, 12, 13, '#7a4a21');
-      if (!store.shop.open && !store.menu.open) surface.txt('出口', 7 * config.TILE + 8, 8 * config.TILE - 3, '#fff2cf', 'center');
+      surface.ctx.font = '6px "PingFang TC","Microsoft JhengHei",sans-serif';
+      if (!store.shop.open && !store.menu.open) surface.txt('出口', 7 * config.TILE + 8, 8 * config.TILE - 3, '#c9ab78', 'center');
       /* 玩家 */
       var frames = [0, 1, 2, 1];
       var fi = store.player.moving ? frames[store.player.step] : 1;
@@ -153,6 +158,44 @@
       for (var c = config.PEN.c0; c <= config.PEN.c1 + 1; c++){ post(c * config.TILE, yt); post(c * config.TILE, yb); }
       post(xr, config.PEN.r0 * config.TILE); post(xr, (config.PEN.gate.r + 1) * config.TILE); post(xr, (config.PEN.r1 + 1) * config.TILE);
       post(xl, config.PEN.r0 * config.TILE); post(xl, config.PEN.gate.r * config.TILE); post(xl, (config.PEN.gate.r + 1) * config.TILE); post(xl, (config.PEN.r1 + 1) * config.TILE);
+      // A visibly open west gate, exactly matching the passable collision tile.
+      var gx = config.PEN.gate.c * config.TILE, gy = config.PEN.gate.r * config.TILE;
+      surface.px(gx + 5, gy, 6, 2, '#f2c230');
+      surface.px(gx + 5, gy + config.TILE - 2, 6, 2, '#f2c230');
+      surface.px(gx, gy - 13, 16, 10, '#765134');
+      surface.px(gx + 1, gy - 12, 14, 8, '#d9bf92');
+      surface.px(gx + 7, gy - 3, 2, 3, '#765134');
+      surface.ctx.font = '6px "PingFang TC","Microsoft JhengHei",sans-serif';
+      surface.txt('入口', gx + 8, gy - 6, '#503b2b', 'center');
+    }
+
+    function drawPlot(c, r, p){
+      var x = c * config.TILE, y = r * config.TILE;
+      // Keep the original pixel-art terrain, within the tile's own bounds.
+      var img = p.tilled ? images.tile_soil : images.tile_dirt;
+      if (img && img.complete && img.naturalWidth) surface.ctx.drawImage(img, x, y, config.TILE, config.TILE);
+      if (!p.tilled){
+        surface.px(x + 3, y + 3, 1, 3, '#527c32');
+        surface.px(x + 2, y + 4, 3, 1, '#719840');
+        surface.px(x + 11, y + 10, 1, 3, '#527c32');
+        surface.px(x + 10, y + 11, 3, 1, '#719840');
+        return;
+      }
+      for (var i = 4; i < 15; i += 4) surface.px(x + 3, y + i, 10, 1, '#55321f');
+      if (p.watered) surface.px(x + 1, y + 1, 14, 14, 'rgba(25,40,75,.3)');
+    }
+
+    function drawWaterStatus(c, r, p){
+      if (p.growth >= config.CROPS[p.crop].days) return;
+      var x = c * config.TILE + 10, y = r * config.TILE + 2;
+      surface.px(x - 1, y - 1, 6, 7, '#352b26');
+      if (p.watered || store.farm.rainy){
+        surface.px(x, y + 3, 2, 2, '#7fd8d0');
+        surface.px(x + 2, y + 1, 2, 3, '#7fd8d0');
+      } else {
+        surface.px(x + 1, y, 2, 2, '#8fd0f0');
+        surface.px(x, y + 2, 4, 3, '#5aa8dd');
+      }
     }
 
     function drawCropPlant(c, r, p){
@@ -167,12 +210,8 @@
       surface.px(-4, -11, 4, 3, '#6cb457'); surface.px(1, -12, 4, 3, '#6cb457');
       if (frac > 0.55) surface.px(-1.5, -14, 3, 3, crop.color);
       surface.ctx.restore();
-      if (!p.watered && !store.farm.rainy){
-        surface.px(cx - 1, r * config.TILE + 2, 2, 2, '#8fd0f0');
-        surface.px(cx - 2, r * config.TILE + 4, 4, 2, '#5aa8dd');
-      }
     }
 
-    return { drawFigure, drawShopBuilding, drawMarket, drawShopInterior, computeCam, drawHouse, drawTree, drawFences, drawCropPlant };
+    return { drawFigure, drawShopBuilding, drawMarket, drawShopInterior, computeCam, drawHouse, drawTree, drawFences, drawPlot, drawCropPlant, drawWaterStatus };
   };
 })(window.PixelFarm);

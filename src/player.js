@@ -1,7 +1,18 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createPlayer = function ({ config, store, world, commerce, audio, dialogue, goals }) {
+  PixelFarm.createPlayer = function ({ config, store, world, animals, commerce, audio, dialogue, goals }) {
+    let turning = false;
+    let pendingStep = null;
+    function cancelPendingStep(){ pendingStep=null; }
+    function faceDirection(d){
+      if (!d || store.player.moving || store.sleeping || store.dialogue.active) return;
+      if (d !== store.player.dir){
+        cancelPendingStep();
+        store.player.dir=d; store.input.holdDir=d; store.input.holdT=0; turning=true;
+      }
+    }
+    function releaseDirection(d){ if (d && store.input.holdDir === d) turning=false; }
     function curDir(){
       if (store.input.keys['arrowup'] || store.input.keys['w'] || store.input.touchDir === 'up') return 'up';
       if (store.input.keys['arrowdown'] || store.input.keys['s'] || store.input.touchDir === 'down') return 'down';
@@ -14,7 +25,13 @@
       var v = config.DIRS[d];
       store.player.dir = d;
       var nc = store.player.tx + v[0], nr = store.player.ty + v[1];
-      if (world.solidAt(nc, nr)) return;
+      if (world.solidAt(nc, nr)){ cancelPendingStep(); return; }
+      if (world.animalBlocksStep(nc, nr)){
+        if (!pendingStep) pendingStep={d:d,c:nc,r:nr,started:Date.now()};
+        animals.yieldForPlayer(nc,nr);
+        return;
+      }
+      cancelPendingStep();
       store.player.tx = nc; store.player.ty = nr; store.player.moving = true;
     }
 
@@ -34,6 +51,10 @@
     function updatePlayer(dt){
       var hd = curDir();
       if (hd && hd === store.input.holdDir) store.input.holdT += dt; else { store.input.holdDir = hd; store.input.holdT = 0; }
+      if (pendingStep && !store.player.moving){
+        if (Date.now() - pendingStep.started > 1200 || store.player.dir !== pendingStep.d || (hd && hd !== pendingStep.d)) cancelPendingStep();
+        else { tryStep(pendingStep.d); return; }
+      }
       if (store.player.moving){
         var txp = store.player.tx * config.TILE, typ = store.player.ty * config.TILE;
         var dx = txp - store.player.px, dy = typ - store.player.py;
@@ -52,7 +73,17 @@
         if (store.player.stepT > 105){ store.player.stepT = 0; store.player.step = (store.player.step + 1) % 4; }
       } else {
         var d = curDir();
-        if (d) tryStep(d);
+        if (!d){ turning = false; return; }
+        if (d !== store.player.dir){
+          store.player.dir = d;
+          store.input.holdT = 0;
+          turning = true;
+          return;
+        }
+        // A light tap turns on the current tile; holding continues into a step.
+        if (turning && store.input.holdT < 0.12) return;
+        turning = false;
+        tryStep(d);
       }
     }
 
@@ -62,6 +93,6 @@
       return { c: pc + d[0], r: pr + d[1] };
     }
 
-    return { updatePlayer, facedTile };
+    return { updatePlayer, facedTile, faceDirection, releaseDirection, cancelPendingStep };
   };
 })(window.PixelFarm);

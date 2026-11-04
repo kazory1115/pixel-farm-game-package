@@ -31,7 +31,9 @@
           if (store.farm.produce[id] > 0){ any = true; rows.push({ label: config.CROPS[id].name, meta: '×' + store.farm.produce[id], info: true }); }
         });
         if (store.farm.produce.egg > 0){ any = true; rows.push({ label:'雞蛋', meta:'×' + store.farm.produce.egg, info: true }); }
-        if (!any) rows.push({ label:'（背包是空的）', info: true });
+        if (store.farm.fertilizer > 0) rows.push({ label:'肥料', meta:'×' + store.farm.fertilizer, info: true });
+        if (store.farm.sprinkler) rows.push({ label:'灑水器', meta:'已裝備', info: true });
+        if (!rows.length) rows.push({ label:'（背包是空的）', info: true });
         if (any) rows.push({ label:'（拿到南邊市集才賣得掉）', info: true });
         return rows;
       }
