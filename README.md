@@ -4,6 +4,8 @@
 
 開發版需要保留 `src/`、`styles/` 和 `assets/game/` 的相對位置。如果只想分享一個 HTML 檔，使用下方的單檔匯出指令。
 
+GitHub Pages 使用 `master` 的 `/(root)` 發布時，根目錄的 `index.html` 會自動導向遊戲，直接開啟網站根網址就能遊玩。舊的完整遊戲網址仍可使用。
+
 ## 怎麼玩
 
 - 移動：WASD／方向鍵，手機使用畫面上的方向按鈕。
@@ -35,6 +37,7 @@
 
 | 位置 | 責任 |
 | --- | --- |
+| `index.html` | GitHub Pages 首頁入口，自動導向遊戲 |
 | `xiang-su-nong-chang-xiao-you-xi.html` | 頁面結構與 script 載入順序 |
 | `styles/game.css` | 原版滿版版面、觸控按鈕與夜晚遮罩樣式 |
 | `src/config.js` | 地圖位置、作物、價格、工具與移動設定 |
