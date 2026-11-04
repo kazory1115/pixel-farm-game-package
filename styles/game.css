@@ -1,0 +1,93 @@
+  :root{
+    --bg:#c9cce0; --ink:#2a2440; --ink-soft:#5a5578;
+    --win-top:#4a4e7d; --win-top2:#34375c; --frame:#23243a;
+    --btn-dark:#2b2c47; --btn-line:#17182a; --accent:#5d8a3c;
+    --panel:#eef0fa; --line:#a9abd0; --shadow:0 4px 14px rgba(30,30,70,.18);
+    color-scheme:light dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1d1e2a; --ink:#ece8f5; --ink-soft:#a9a4c4; --panel:#2b2d40; --line:#454868; --shadow:0 4px 14px rgba(0,0,0,.45); }
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; overflow:hidden; overscroll-behavior:none; }
+  body{
+    background:#131420;
+    color:var(--ink);
+    font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+    -webkit-tap-highlight-color:transparent;
+    display:flex;
+  }
+  /* 整個遊戲介面填滿視窗：寬高都撐到最大，頁面不捲動、無邊框 */
+  .wrap{ flex:1; min-width:0; width:100vw; height:100vh; height:100dvh; display:flex; }
+
+  /* ---------- 遊戲主體：無外框，直接貼滿整個視窗 ---------- */
+  .window{
+    flex:1; min-width:0; min-height:0; width:100%; height:100%;
+    display:flex; flex-direction:column;
+    background:#131420; overflow:hidden;
+    user-select:none; -webkit-user-select:none;
+  }
+  /* 不再顯示視窗標題列／外框：遊戲主體本身就是整個畫面 */
+  .titlebar{ display:none; }
+  .stage{
+    position:relative; line-height:0; background:#131420;
+    flex:1; min-height:0; min-width:0; width:100%;
+    display:block; overflow:hidden;
+  }
+  /* 畫面本體：直向與橫向都直接貼滿 stage 的寬與高（由 JS 設為視窗大小），
+     不置中、不留邊，覆蓋層（按鈕／夜晚遮罩）也以這個滿版畫面為準 */
+  .screen{ position:absolute; inset:0; line-height:0; width:100%; height:100%; }
+  canvas#game{ width:100%; height:100%; display:block; image-rendering:crisp-edges; image-rendering:pixelated; touch-action:none; }
+  .nightfade{
+    position:absolute; inset:0; background:#131a33; opacity:0; pointer-events:none;
+    transition:opacity .7s ease; display:flex; align-items:center; justify-content:center;
+  }
+  .nightfade.on{ opacity:.93; }
+  .nightfade span{
+    color:#f5ead0; font-size:clamp(20px,5vw,32px); font-weight:800; letter-spacing:.18em;
+    font-family:"DotGothic16","PingFang TC",sans-serif;
+    opacity:0; transition:opacity .4s ease .25s;
+  }
+  .nightfade.on span{ opacity:1; }
+
+  /* ---------- 畫面內半透明控制層（浮在遊戲畫面上） ---------- */
+  .padbar{
+    position:absolute; left:0; right:0; bottom:0; z-index:5;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
+    padding:26px calc(12px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px)); line-height:1.2;
+    background:linear-gradient(180deg, rgba(12,12,28,0), rgba(12,12,28,.14));
+    pointer-events:none;
+  }
+  .padbar button{ pointer-events:auto; }
+  .dpad{ position:relative; width:96px; height:96px; flex:none; }
+  .dpad .hub{ position:absolute; left:32px; top:32px; width:32px; height:32px; background:rgba(24,25,48,.26); }
+  .dpad button{
+    position:absolute; width:32px; height:32px; padding:0; font-size:12px; cursor:pointer;
+    background:rgba(24,25,48,.32); color:rgba(224,222,248,.96); border:2px solid rgba(12,12,26,.32); border-radius:6px;
+    box-shadow:0 3px 0 rgba(12,12,26,.3); touch-action:none; font-family:inherit;
+    text-shadow:0 1px 2px rgba(8,8,24,.85), 0 0 3px rgba(8,8,24,.6);
+  }
+  .dpad button:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(12,12,26,.3); }
+  .dpad .up{ left:32px; top:0; } .dpad .down{ left:32px; bottom:0; }
+  .dpad .left{ left:0; top:32px; } .dpad .right{ right:0; top:32px; }
+  .padbtns{ display:flex; flex-direction:column; align-items:flex-end; gap:9px; }
+  .abrow{ display:flex; gap:10px; }
+  .abtn{
+    width:48px; height:48px; border-radius:50%; cursor:pointer;
+    background:rgba(24,25,48,.32); color:rgba(232,230,255,.97); border:2px solid rgba(12,12,26,.32);
+    font-size:16px; font-weight:900; font-family:"DotGothic16",sans-serif;
+    box-shadow:0 4px 0 rgba(12,12,26,.3); touch-action:none;
+    text-shadow:0 1px 2px rgba(8,8,24,.85), 0 0 3px rgba(8,8,24,.6);
+  }
+  .abtn:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(12,12,26,.3); }
+  .abtn.a{ background:rgba(128,44,64,.36); border-color:rgba(66,22,36,.36); box-shadow:0 4px 0 rgba(66,22,36,.32); }
+  .sysrow{ display:flex; gap:9px; }
+  .pill{
+    cursor:pointer; border-radius:999px; padding:5px 13px; font-size:11.5px; font-weight:700;
+    letter-spacing:.1em; background:rgba(24,25,48,.32); color:rgba(224,222,248,.96);
+    border:2px solid rgba(12,12,26,.32); box-shadow:0 2px 0 rgba(12,12,26,.3);
+    font-family:"DotGothic16","PingFang TC",sans-serif;
+    text-shadow:0 1px 2px rgba(8,8,24,.85), 0 0 3px rgba(8,8,24,.6);
+  }
+  .pill:active{ transform:translateY(1px); }
+

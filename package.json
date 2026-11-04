@@ -1,0 +1,14 @@
+{
+  "name": "pixel-farm-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "可離線開啟的像素農場遊戲",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node tests/parity.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
