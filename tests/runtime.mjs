@@ -8,16 +8,23 @@ export const digest = value => createHash('sha256').update(value).digest('hex');
 const copy = value => JSON.parse(JSON.stringify(value));
 
 // Minimal deterministic browser boundary. Draw calls are recorded, not rasterized.
-export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {}) {
+export async function loadGame({ legacyPath, htmlPath = path.join(root, entry), waitForStart=true, imageMode='ready', fontMode='ready', storage = new Map() } = {}) {
   const calls = [];
   const elements = new Map();
   const events = new Map();
-  const timeouts = [];
+  const timeouts = new Map();
+  const imageElements = [];
+  const fontRequests = [];
+  const fontResolvers = [];
+  const links = [];
+  const canvasResizes = [];
   const frames = [];
   let randomSeed = 123456789;
   let clock = 1700000000000;
   let frameTime = 0;
   let canvasCount = 0;
+  let linkCount = 0;
+  let timerId = 0;
 
   function canvasContext(label) {
     const initial = { font:'10px sans-serif', fillStyle:'#000000', strokeStyle:'#000000', lineWidth:1, textAlign:'start', imageSmoothingEnabled:true };
@@ -52,10 +59,11 @@ export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {})
     const context = canvasContext(id);
     let width = 720, height = 480;
     const result = {
-      canvasLabel:id, style:{}, clientWidth:1280, clientHeight:720,
-      textContent:'', className:'',
-      get width() { return width; }, set width(value) { width=value; context.reset(); },
-      get height() { return height; }, set height(value) { height=value; context.reset(); },
+      canvasLabel:id, style:{ setProperty(name,value) { this[name]=value; } }, clientWidth:1280, clientHeight:720,
+      textContent:'', className:'', hidden:id === 'retryLoad',
+      get width() { return width; }, set width(value) { width=value; context.reset(); canvasResizes.push([id,'width',value]); },
+      get height() { return height; }, set height(value) { height=value; context.reset(); canvasResizes.push([id,'height',value]); },
+      remove() { this.removed=true; },
       getContext: () => context,
       addEventListener: (type, fn) => addEvent(id, type, fn),
       getAttribute: name => name === 'data-dir' ? id.replace('dpad-', '') : null,
@@ -66,15 +74,28 @@ export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {})
   }
 
   class Image {
+    constructor() { imageElements.push(this); if (imageMode === 'no-decode') this.decode=undefined; }
     set src(value) {
       this.source = value;
       const bytes = value.startsWith('data:') ? Buffer.from(value.split(',')[1], 'base64') : fs.readFileSync(path.join(root, value));
       this.imageHash = digest(bytes);
-      this.naturalWidth = bytes.readUInt32BE(16);
-      this.naturalHeight = bytes.readUInt32BE(20);
-      this.complete = true;
+      this.size = [bytes.readUInt32BE(16),bytes.readUInt32BE(20)];
+      this.naturalWidth = this.naturalHeight = 0;
+      this.complete = false;
+      if (imageMode === 'error') queueMicrotask(() => { this.complete=true; this.onerror?.(); });
+      else if (imageMode !== 'deferred') this.finishLoading(false);
     }
     get src() { return this.source; }
+    finishLoading(emit=true) {
+      [this.naturalWidth,this.naturalHeight] = this.size;
+      this.complete=true;
+      if (emit) this.onload?.();
+    }
+    decode() {
+      if (imageMode === 'decode-error') return Promise.reject(new Error('decode failed'));
+      if (imageMode === 'decode-deferred') return new Promise(resolve => { this.finishDecode=resolve; });
+      return Promise.resolve();
+    }
   }
 
   const seededMath = Object.create(Math);
@@ -85,13 +106,31 @@ export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {})
     addEventListener:(type, fn) => addEvent('window', type, fn),
     visualViewport:{ addEventListener:(type, fn) => addEvent('viewport', type, fn) },
     document:{
-      createElement:() => element(`scene-${canvasCount++}`),
+      createElement:tag => element(tag === 'link' ? `font-link-${linkCount++}` : `scene-${canvasCount++}`),
       getElementById:element,
-      querySelectorAll:() => ['up','down','left','right'].map(dir => element(`dpad-${dir}`)),
-      fonts:{ load:() => Promise.resolve() }
+      querySelectorAll:selector => selector === '.dpad button'
+        ? ['up','down','left','right'].map(dir => element(`dpad-${dir}`))
+        : ['btnA','btnB','btnStart','btnSelect','nightText'].map(element),
+      head:{ appendChild(link) {
+        links.push(link);
+        if (fontMode !== 'stylesheet-deferred') queueMicrotask(() => {
+          if (fontMode === 'error') link.onerror?.();
+          else link.onload?.();
+        });
+      } },
+      fonts:fontMode === 'unavailable' ? undefined : { load:(font,text) => {
+        fontRequests.push({font,text});
+        return fontMode === 'font-deferred' ? new Promise(resolve => fontResolvers.push(resolve)) : Promise.resolve(fontMode === 'empty' ? [] : [{}]);
+      } }
     },
-    setTimeout:(fn, delay) => { timeouts.push({ fn, delay }); return timeouts.length; },
+    location:{ reload:() => { sandbox.reloadCount=(sandbox.reloadCount || 0)+1; } },
+    setTimeout:(fn, delay) => { timeouts.set(++timerId,{fn,delay}); return timerId; },
+    clearTimeout:id => timeouts.delete(id),
     requestAnimationFrame:fn => { frames.push(fn); return frames.length; }
+  };
+  sandbox.localStorage = {
+    getItem:key => storage.has(key) ? storage.get(key) : null,
+    setItem:(key,value) => storage.set(key,value)
   };
   sandbox.window = sandbox;
   const context = vm.createContext(sandbox);
@@ -117,7 +156,11 @@ export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {})
     fitScreen:'surface', draw:'renderer', panelGeom:'panels', isSolid:'world', isSolidShop:'world', setSound:'audio'
   };
   const api = {
-    game, sandbox, html, calls, events,
+    game, sandbox, html, calls, events, imageElements, fontRequests, fontResolvers, links, canvasResizes,
+    ready:game?.start(),
+    pendingFrames:() => frames.length,
+    pendingTimers:() => timeouts.size,
+    advanceTime(milliseconds) { frameTime+=milliseconds; clock+=milliseconds; },
     get(name) { return isLegacy ? sandbox[name] : game.store[fields[name]]; },
     set(name, value) { if (isLegacy) sandbox[name]=value; else game.store[fields[name]]=value; },
     call(name, ...args) {
@@ -137,7 +180,12 @@ export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {})
         next(frameTime);
       }
     },
-    timers() { const pending = timeouts.splice(0); pending.forEach(({fn}) => fn()); return pending.map(({delay}) => delay); },
+    timers(delay) {
+      const pending = [...timeouts].filter(([,timer]) => delay === undefined || timer.delay === delay);
+      pending.forEach(([id]) => timeouts.delete(id));
+      pending.forEach(([,timer]) => timer.fn());
+      return pending.map(([,timer]) => timer.delay);
+    },
     resize(width, height, dpr=1) {
       Object.assign(element('stage'), { clientWidth:width, clientHeight:height });
       sandbox.devicePixelRatio=dpr; api.emit('window','resize');
@@ -161,5 +209,6 @@ export function loadGame({ legacyPath, htmlPath = path.join(root, entry) } = {})
     },
     overlay() { return { text:element('nightText').textContent, className:element('nightfade').className }; }
   };
+  if (waitForStart && game) await api.ready;
   return api;
 }

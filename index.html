@@ -7,7 +7,6 @@
 <link rel="icon" href="data:," />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet" />
 <title>像素農場小遊戲</title>
 <link rel="stylesheet" href="styles/game.css" />
 </head>
@@ -22,7 +21,7 @@
      <div class="screen" id="screen">
       <canvas id="game" width="720" height="480"></canvas>
       <div class="nightfade" id="nightfade"><span id="nightText">第 2 天</span></div>
-      <div class="padbar">
+      <div class="padbar" id="padbar">
         <div class="dpad">
           <span class="hub"></span>
           <button class="up" data-dir="up" aria-label="上">▲</button>
@@ -47,6 +46,13 @@
 
 </div>
 
+<section class="startup" id="startup" role="status" aria-live="polite">
+  <h1>像素農場</h1>
+  <p id="loadMessage">正在準備農場…</p>
+  <progress id="loadProgress" max="1" value="0" aria-label="遊戲素材載入進度"></progress>
+  <button id="retryLoad" type="button" hidden>重新載入</button>
+</section>
+
 <script src="src/namespace.js" defer></script>
 <script src="src/config.js" defer></script>
 <script src="src/state.js" defer></script>
@@ -67,6 +73,7 @@
 <script src="src/render/panels.js" defer></script>
 <script src="src/render/renderer.js" defer></script>
 <script src="src/input.js" defer></script>
+<script src="src/startup.js" defer></script>
 <script src="src/main.js" defer></script>
 <script src="src/bootstrap.js" defer></script>
 </body>

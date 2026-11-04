@@ -52,42 +52,63 @@
 
   /* ---------- 畫面內半透明控制層（浮在遊戲畫面上） ---------- */
   .padbar{
+    --control-scale:1;
+    --control-base:clamp(36px, min(10vw, 7dvh), 56px);
+    --control-unit:min(calc(var(--control-base) * var(--control-scale)), calc((100vw - 28px) / 6.5), 13dvh);
+    --control-gap:calc(var(--control-unit) * .22);
     position:absolute; left:0; right:0; bottom:0; z-index:5;
-    display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
-    padding:26px calc(12px + env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) calc(12px + env(safe-area-inset-left, 0px)); line-height:1.2;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:var(--control-gap);
+    padding:calc(var(--control-unit) * .65) calc(10px + env(safe-area-inset-right, 0px)) calc(var(--control-unit) * .3 + env(safe-area-inset-bottom, 0px)) calc(10px + env(safe-area-inset-left, 0px)); line-height:1.2;
     background:linear-gradient(180deg, rgba(12,12,28,0), rgba(12,12,28,.14));
     pointer-events:none;
   }
   .padbar button{ pointer-events:auto; }
-  .dpad{ position:relative; width:96px; height:96px; flex:none; }
-  .dpad .hub{ position:absolute; left:32px; top:32px; width:32px; height:32px; background:rgba(24,25,48,.26); }
+  .dpad{ position:relative; width:calc(var(--control-unit) * 3); height:calc(var(--control-unit) * 3); flex:none; }
+  .dpad .hub{ position:absolute; left:var(--control-unit); top:var(--control-unit); width:var(--control-unit); height:var(--control-unit); background:rgba(24,25,48,.26); }
   .dpad button{
-    position:absolute; width:32px; height:32px; padding:0; font-size:12px; cursor:pointer;
-    background:rgba(24,25,48,.32); color:rgba(224,222,248,.96); border:2px solid rgba(12,12,26,.32); border-radius:6px;
+    position:absolute; width:var(--control-unit); height:var(--control-unit); padding:0; font-size:calc(var(--control-unit) * .36); cursor:pointer;
+    background:rgba(24,25,48,.32); color:rgba(224,222,248,.96); border:2px solid rgba(12,12,26,.32); border-radius:calc(var(--control-unit) * .18);
     box-shadow:0 3px 0 rgba(12,12,26,.3); touch-action:none; font-family:inherit;
     text-shadow:0 1px 2px rgba(8,8,24,.85), 0 0 3px rgba(8,8,24,.6);
   }
   .dpad button:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(12,12,26,.3); }
-  .dpad .up{ left:32px; top:0; } .dpad .down{ left:32px; bottom:0; }
-  .dpad .left{ left:0; top:32px; } .dpad .right{ right:0; top:32px; }
-  .padbtns{ display:flex; flex-direction:column; align-items:flex-end; gap:9px; }
-  .abrow{ display:flex; gap:10px; }
+  .dpad .up{ left:var(--control-unit); top:0; } .dpad .down{ left:var(--control-unit); bottom:0; }
+  .dpad .left{ left:0; top:var(--control-unit); } .dpad .right{ right:0; top:var(--control-unit); }
+  .padbtns{ display:flex; flex-direction:column; align-items:flex-end; gap:calc(var(--control-unit) * .18); }
+  .abrow{ display:flex; gap:var(--control-gap); }
   .abtn{
-    width:48px; height:48px; border-radius:50%; cursor:pointer;
+    width:calc(var(--control-unit) * 1.5); height:calc(var(--control-unit) * 1.5); border-radius:50%; cursor:pointer;
     background:rgba(24,25,48,.32); color:rgba(232,230,255,.97); border:2px solid rgba(12,12,26,.32);
-    font-size:16px; font-weight:900; font-family:"DotGothic16",sans-serif;
+    font-size:calc(var(--control-unit) * .5); font-weight:900; font-family:"DotGothic16",sans-serif;
     box-shadow:0 4px 0 rgba(12,12,26,.3); touch-action:none;
     text-shadow:0 1px 2px rgba(8,8,24,.85), 0 0 3px rgba(8,8,24,.6);
   }
   .abtn:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(12,12,26,.3); }
   .abtn.a{ background:rgba(128,44,64,.36); border-color:rgba(66,22,36,.36); box-shadow:0 4px 0 rgba(66,22,36,.32); }
-  .sysrow{ display:flex; gap:9px; }
+  .sysrow{ display:flex; gap:var(--control-gap); }
   .pill{
-    cursor:pointer; border-radius:999px; padding:5px 13px; font-size:11.5px; font-weight:700;
+    cursor:pointer; border-radius:999px; padding:calc(var(--control-unit) * .12) calc(var(--control-unit) * .25); min-height:calc(var(--control-unit) * .85); font-size:calc(var(--control-unit) * .32); font-weight:700;
     letter-spacing:.1em; background:rgba(24,25,48,.32); color:rgba(224,222,248,.96);
     border:2px solid rgba(12,12,26,.32); box-shadow:0 2px 0 rgba(12,12,26,.3);
     font-family:"DotGothic16","PingFang TC",sans-serif;
     text-shadow:0 1px 2px rgba(8,8,24,.85), 0 0 3px rgba(8,8,24,.6);
   }
   .pill:active{ transform:translateY(1px); }
+  @media (max-width:700px){
+    .sysrow{ flex-direction:column; align-items:flex-end; }
+  }
 
+/* Startup loading */
+  .startup{
+    position:fixed; inset:0; z-index:20; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px; padding:24px;
+    background:#131420; color:#f5ead0; text-align:center; line-height:1.6;
+  }
+  .startup[hidden]{ display:none; }
+  .startup h1{ margin:0; font-size:28px; letter-spacing:.15em; }
+  .startup p{ margin:0; max-width:32em; font-size:14px; }
+  .startup progress{ width:min(260px,75vw); height:12px; accent-color:#9dbb6d; }
+  .startup button{
+    padding:8px 20px; border:2px solid #9dbb6d; background:#23243a;
+    color:#f5ead0; font:inherit; cursor:pointer;
+  }

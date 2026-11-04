@@ -8,7 +8,8 @@
     var ctx = sc.getContext('2d'); ctx.imageSmoothingEnabled = false;
     var disp = document.getElementById('game');
     var dctx = disp.getContext('2d'); dctx.imageSmoothingEnabled = false;
-    if (document.fonts && document.fonts.load){ document.fonts.load('24px "DotGothic16"'); document.fonts.load('27px "DotGothic16"'); }
+    var fontFamily = '"DotGothic16","PingFang TC","Microsoft JhengHei",sans-serif';
+    function setFontFamily(family){ fontFamily = family; }
     var textQueue = [];
     function drawFit(img, cx, cy, h, flip){
       if (!img || !img.complete || !img.naturalWidth) return;
@@ -45,7 +46,7 @@
     function flushText(){
       for (var i = 0; i < textQueue.length; i++){
         var t = textQueue[i];
-        dctx.font = (t.bold ? 'bold ' : '') + (t.size * view.scaleY) + 'px "DotGothic16","PingFang TC","Microsoft JhengHei",sans-serif';
+        dctx.font = (t.bold ? 'bold ' : '') + (t.size * view.scaleY) + 'px ' + fontFamily;
         dctx.fillStyle = t.color; dctx.textAlign = t.align;
         dctx.fillText(t.s, t.x * view.scaleX, t.y * view.scaleY);
       }
@@ -71,12 +72,13 @@
       if (sc.height !== view.height) sc.height = view.height;
       ctx.imageSmoothingEnabled = false;
       var dpr = Math.min(2, window.devicePixelRatio || 1);
-      disp.width = Math.round(aw * dpr);
-      disp.height = Math.round(ah * dpr);
+      var displayWidth = Math.round(aw * dpr), displayHeight = Math.round(ah * dpr);
+      if (disp.width !== displayWidth) disp.width = displayWidth;
+      if (disp.height !== displayHeight) disp.height = displayHeight;
       dctx.imageSmoothingEnabled = false;
       view.scaleX = disp.width / view.width; view.scaleY = disp.height / view.height;
     }
 
-    return { drawFit, drawTile, drawTileFlat, px, txt, flushText, fitScreen, view, ctx, dctx, sceneCanvas: sc, canvas: disp, textQueue };
+    return { drawFit, drawTile, drawTileFlat, px, txt, flushText, fitScreen, setFontFamily, view, ctx, dctx, sceneCanvas: sc, canvas: disp, textQueue };
   };
 })(window.PixelFarm);

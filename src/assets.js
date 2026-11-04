@@ -58,13 +58,70 @@
   "player_house": "assets/game/player_house.png"
 };
 
-  PixelFarm.createAssets = function (ImageType) {
+  PixelFarm.createAssets = function ({ ImageType, setTimeout, clearTimeout }) {
     const images = {};
-    Object.keys(PixelFarm.assetSources).forEach(function (name) {
-      const image = new ImageType();
-      image.src = PixelFarm.assetSources[name];
-      images[name] = image;
-    });
-    return images;
+    let pending;
+
+    function load(onProgress = function () {}) {
+      if (pending) return pending;
+      const names = Object.keys(PixelFarm.assetSources);
+      const cleanups = [];
+      let completed = 0;
+      let failed = false;
+      onProgress(0, names.length);
+
+      const tasks = names.map(function (name) {
+        const image = new ImageType();
+        images[name] = image;
+        image.decoding = 'async';
+        return new Promise(function (resolve, reject) {
+          let settled = false;
+          let decoding = false;
+          const cleanup = function () {
+            clearTimeout(timer);
+            image.onload = null;
+            image.onerror = null;
+          };
+          const finish = function (error) {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            if (error) reject(error);
+            else {
+              completed++;
+              if (!failed) onProgress(completed, names.length);
+              resolve(image);
+            }
+          };
+          const timer = setTimeout(function () {
+            finish(new Error('圖片載入逾時：' + name));
+          }, 30000);
+          cleanups.push(cleanup);
+          image.onerror = function () { finish(new Error('無法載入圖片：' + name)); };
+          image.onload = function () {
+            if (decoding || settled) return;
+            decoding = true;
+            if (!image.naturalWidth) { image.onerror(); return; }
+            // complete only describes loading; decode keeps the first draw from
+            // having to synchronously decode all the source PNGs.
+            Promise.resolve().then(function () {
+              return typeof image.decode === 'function' ? image.decode() : undefined;
+            }).then(function () { finish(); }, function () {
+              finish(new Error('無法解碼圖片：' + name));
+            });
+          };
+          image.src = PixelFarm.assetSources[name];
+          if (image.complete) image.onload();
+        });
+      });
+      pending = Promise.all(tasks).catch(function (error) {
+        failed = true;
+        cleanups.forEach(function (cleanup) { cleanup(); });
+        throw error;
+      });
+      return pending;
+    }
+
+    return { images, load };
   };
 })(window.PixelFarm);

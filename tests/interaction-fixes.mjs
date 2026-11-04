@@ -27,7 +27,7 @@ function pointer(api, type, x, y, id=1, pointerType='touch') {
 }
 
 export function registerInteractionTests(format, options) {
-  const check = (name, fn) => test(`${format}: ${name}`, () => fn(loadGame(options)));
+  const check = (name, fn) => test(`${format}: ${name}`, async () => fn(await loadGame(options)));
 
   check('shop START menu is visible on every tab, pauses movement, and closes', api => {
     api.call('enterShop');
@@ -48,6 +48,24 @@ export function registerInteractionTests(format, options) {
     api.emit('btnB','click');
     assert.equal(api.get('menu').open,false);
     assert.equal(api.get('scene'),'shop');
+  });
+
+  check('button size setting updates controls and is saved', async api => {
+    const padbar = api.sandbox.document.getElementById('padbar');
+    assert.equal(padbar.style['--control-scale'], '1');
+    api.call('toggleMenu');
+    api.get('menu').tab = 4;
+    api.get('menu').idx = 2;
+    api.call('menuActivate');
+    assert.equal(padbar.style['--control-scale'], '1.2');
+    assert.equal(api.sandbox.localStorage.getItem('pixelFarm.controlSize'), '120');
+    assert.equal(api.call('menuItems')[2].label, '按鈕大小：120%');
+    api.call('menuActivate');
+    api.call('menuActivate');
+    assert.equal(padbar.style['--control-scale'], '0.8');
+    const saved = api.sandbox.localStorage.getItem('pixelFarm.controlSize');
+    const restored = await loadGame({ ...options, storage:new Map([['pixelFarm.controlSize',saved]]) });
+    assert.equal(restored.sandbox.document.getElementById('padbar').style['--control-scale'], '0.8');
   });
 
   check('portrait price board and long Unicode dialogue render every character across pages', api => {

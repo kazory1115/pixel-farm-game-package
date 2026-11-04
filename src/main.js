@@ -5,7 +5,8 @@
   PixelFarm.createGame = function ({ window, document }) {
     const config = PixelFarm.config;
     const store = PixelFarm.createStore(config);
-    const images = PixelFarm.createAssets(window.Image);
+    const assets = PixelFarm.createAssets({ ImageType:window.Image, setTimeout:window.setTimeout.bind(window), clearTimeout:window.clearTimeout.bind(window) });
+    const images = assets.images;
     const world = PixelFarm.createWorld({ config, store });
     const audio = PixelFarm.createAudio({ store, window });
     const surface = PixelFarm.createSurface({ config, window, document });
@@ -17,12 +18,16 @@
     const player = PixelFarm.createPlayer({ config, store, world, commerce, audio, dialogue, goals });
     const day = PixelFarm.createDayCycle({ config, store, animals, audio, dialogue, goals, document, setTimeout: window.setTimeout.bind(window) });
     const farming = PixelFarm.createFarming({ config, store, world, commerce, day, audio, dialogue, goals });
-    const menu = PixelFarm.createMenu({ config, store, tools, day, audio, goals });
+    const menu = PixelFarm.createMenu({ config, store, tools, day, audio, goals, window, document });
     const worldView = PixelFarm.createWorldView({ config, store, world, surface, images });
     const panels = PixelFarm.createPanels({ config, store, surface, images, tools, menu, commerce, dialogue });
     const renderer = PixelFarm.createRenderer({ config, store, world, player, surface, worldView, panels, images });
     const input = PixelFarm.createInput({ config, store, surface, panels, player, farming, tools, menu, commerce, dialogue, audio, window, document });
-    let started = false;
+    const startup = PixelFarm.createStartup({ window, document });
+    const welcomeText = '歡迎來到像素農場！北邊有商店、南邊有市集，按 START 看說明';
+    const firstFrameText = welcomeText + '0123456789第天晴雨商店市集ABSELECTSTART換工具選單' + config.TOOL_CYCLE.map(tools.toolName).join('');
+    let pendingStart;
+    let fontFamily;
     let lastTime;
 
     function loop(now) {
@@ -38,22 +43,34 @@
         }
       }
       renderer.draw();
+      if (startup.phase === 'loading') startup.ready(fontFamily);
       window.requestAnimationFrame(loop);
     }
 
     function start() {
-      if (started) return;
-      started = true;
-      lastTime = window.performance.now();
-      input.bind();
-      window.addEventListener('resize', surface.fitScreen);
-      window.addEventListener('orientationchange', surface.fitScreen);
-      if (window.visualViewport) window.visualViewport.addEventListener('resize', surface.fitScreen);
-      surface.fitScreen();
-      dialogue.say('歡迎來到像素農場！北邊有商店、南邊有市集，按 START 看說明');
-      window.requestAnimationFrame(loop);
+      if (pendingStart) return pendingStart;
+      pendingStart = Promise.all([
+        assets.load(startup.progress),
+        startup.loadFont(firstFrameText)
+      ]).then(function (results) {
+        fontFamily = results[1];
+        surface.setFontFamily(fontFamily);
+        input.bind();
+        window.addEventListener('resize', surface.fitScreen);
+        window.addEventListener('orientationchange', surface.fitScreen);
+        if (window.visualViewport) window.visualViewport.addEventListener('resize', surface.fitScreen);
+        surface.fitScreen();
+        dialogue.say(welcomeText);
+        lastTime = window.performance.now();
+        window.requestAnimationFrame(loop);
+        return true;
+      }).catch(function (error) {
+        startup.fail(error);
+        return false;
+      });
+      return pendingStart;
     }
 
-    return { start, store, world, audio, dialogue, goals, tools, animals, commerce, player, day, farming, menu, surface, panels, renderer, input };
+    return { start, store, world, audio, dialogue, goals, tools, animals, commerce, player, day, farming, menu, surface, panels, renderer, input, startup };
   };
 })(window.PixelFarm);

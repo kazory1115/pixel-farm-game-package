@@ -1,7 +1,20 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createMenu = function ({ config, store, tools, day, audio, goals }) {
+  PixelFarm.createMenu = function ({ config, store, tools, day, audio, goals, window, document }) {
+    const controlSizes = [80, 100, 120, 140];
+    const storageKey = 'pixelFarm.controlSize';
+    let controlSizeIndex = 1;
+    try {
+      const saved = Number(window.localStorage?.getItem(storageKey));
+      const index = controlSizes.indexOf(saved);
+      if (index >= 0) controlSizeIndex = index;
+    } catch (_) { /* 私密模式或本機檔案可能不允許儲存 */ }
+    function applyControlSize(){
+      document.getElementById('padbar').style.setProperty('--control-scale', String(controlSizes[controlSizeIndex] / 100));
+    }
+    applyControlSize();
+
     function menuItems(){
       if (store.menu.tab === 0){
         return config.TOOL_CYCLE.map(function(o){
@@ -50,6 +63,7 @@
       return [
         { label:'回小屋睡覺', action:'sleep' },
         { label:'音效：' + (store.soundOn ? '開' : '關'), action:'sound' },
+        { label:'按鈕大小：' + controlSizes[controlSizeIndex] + '%', action:'controlSize' },
         { label:'關閉選單', action:'close' }
       ];
     }
@@ -64,6 +78,12 @@
       }
       if (it.action === 'sleep'){ store.menu.open = false; day.sleep(); }
       else if (it.action === 'sound'){ audio.setSound(!store.soundOn); }
+      else if (it.action === 'controlSize'){
+        controlSizeIndex = (controlSizeIndex + 1) % controlSizes.length;
+        applyControlSize();
+        try { window.localStorage?.setItem(storageKey, String(controlSizes[controlSizeIndex])); }
+        catch (_) { /* 仍可在這次遊戲期間調整 */ }
+      }
       else if (it.action === 'close'){ store.menu.open = false; }
     }
     function toggleMenu(){
