@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createMenu = function ({ config, store, tools, day, audio, goals, window, document }) {
+  PixelFarm.createMenu = function ({ config, store, tools, day, audio, goals, persistence, window, document }) {
     const controlSizes = [80, 100, 120, 140];
     const storageKey = 'pixelFarm.controlSize';
     let controlSizeIndex = 1;
@@ -66,6 +66,7 @@
         { label:'回小屋睡覺', action:'sleep' },
         { label:'音效：' + (store.soundOn ? '開' : '關'), action:'sound' },
         { label:'按鈕大小：' + controlSizes[controlSizeIndex] + '%', action:'controlSize' },
+        { label:'立即存檔', meta:persistence.status, action:'save' },
         { label:'關閉選單', action:'close' }
       ];
     }
@@ -87,6 +88,7 @@
         catch (_) { /* 仍可在這次遊戲期間調整 */ }
       }
       else if (it.action === 'close'){ store.menu.open = false; }
+      else if (it.action === 'save'){ persistence.save(); audio.sfx.cursor(); }
     }
     function toggleMenu(){
       if (store.sleeping) return;

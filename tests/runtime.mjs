@@ -106,6 +106,7 @@ export async function loadGame({ legacyPath, htmlPath = path.join(root, entry), 
     addEventListener:(type, fn) => addEvent('window', type, fn),
     visualViewport:{ addEventListener:(type, fn) => addEvent('viewport', type, fn) },
     document:{
+      addEventListener:(type, fn) => addEvent('document', type, fn),
       createElement:tag => element(tag === 'link' ? `font-link-${linkCount++}` : `scene-${canvasCount++}`),
       getElementById:element,
       querySelectorAll:selector => selector === '.dpad button'

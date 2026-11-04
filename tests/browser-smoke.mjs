@@ -6,8 +6,9 @@ import os from 'node:os';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { pathToFileURL } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
-import { root } from '../scripts/build.mjs';
+import { root, build } from '../scripts/build.mjs';
 
 const browser=process.env.BROWSER_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const directory=await fs.mkdtemp(path.join(os.tmpdir(),'pixel-farm-browser-'));
@@ -142,7 +143,46 @@ try {
   })()`);
   assert.equal(yielded.c,6,'a dog on the road must yield to a single requested step');
   assert.equal(yielded.moving,false); assert.ok(yielded.gap>=8);
-  console.log('Browser checks passed: viewport controls, panel pixels, and animal yielding.');
+  const saved=await evaluate(`(() => {
+    const g=PixelFarm.game; Object.assign(g.store.farm,{day:30,coins:119,fertilizer:2});
+    g.store.menu.open=false; g.store.dialogue.active=false;
+    return g.persistence.save();
+  })()`);
+  assert.equal(saved,true);
+  await evaluate('window.__beforeSmokeReload=true');
+  await send('Page.reload',{ignoreCache:true});
+  let restored;
+  for(let i=0;i<100;i++) {
+    restored=await evaluate('!window.__beforeSmokeReload && window.PixelFarm?.game?.startup.phase === "ready" && PixelFarm.game.store.farm.day === 30');
+    if(restored) break;
+    await delay(100);
+  }
+  assert.equal(restored,true,'real browser reload must restore the saved day');
+  assert.deepEqual(await evaluate('[PixelFarm.game.store.farm.coins,PixelFarm.game.store.farm.fertilizer]'),[119,2]);
+  await evaluate(`(() => {
+    const g=PixelFarm.game; g.input.pressB(); Object.assign(g.store.player,{tx:5,ty:6,px:80,py:96,dir:'down',moving:false});
+  })()`);
+  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowLeft',code:'ArrowLeft'});
+  await send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowLeft',code:'ArrowLeft'});
+  await delay(60);
+  assert.deepEqual(await evaluate('[PixelFarm.game.store.player.tx,PixelFarm.game.store.player.ty,PixelFarm.game.store.player.dir]'),[5,6,'left']);
+  const standalone=await build(path.join(directory,'standalone'));
+  await send('Page.navigate',{url:pathToFileURL(standalone).href});
+  for(let i=0;i<100;i++) {
+    if(await evaluate('location.protocol === "file:" && window.PixelFarm?.game?.startup.phase === "ready"')) break;
+    await delay(100);
+  }
+  assert.equal(await evaluate('window.PixelFarm?.game?.startup.phase'),'ready');
+  assert.equal(await evaluate('PixelFarm.game.store.farm.day'),1,'different locations own independent saves');
+  assert.equal(await evaluate('PixelFarm.game.store.farm.day=17;PixelFarm.game.persistence.save()'),true);
+  await evaluate('window.__beforeSmokeReload=true');
+  await send('Page.reload',{ignoreCache:true});
+  for(let i=0;i<100;i++) {
+    if(await evaluate('!window.__beforeSmokeReload && window.PixelFarm?.game?.startup.phase === "ready" && PixelFarm.game.store.farm.day === 17')) break;
+    await delay(100);
+  }
+  assert.equal(await evaluate('PixelFarm.game.store.farm.day'),17,'directly opened standalone HTML must retain its save');
+  console.log('Browser checks passed: 5 viewport sizes × 4 button sizes; panel pixels, HTTP/file reload persistence, and tap-to-turn.');
   console.log('Screenshots: '+directory);
   await send('Browser.close').catch(()=>{});
 } finally {

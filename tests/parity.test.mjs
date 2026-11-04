@@ -36,6 +36,8 @@ for(const [name,scenario] of Object.entries(scenarios)) {
         assert.deepEqual(settings.items[2], { label:'按鈕大小：100%', action:'controlSize' });
         assert.deepEqual(settings.render.view, previous.render.view);
         settings.items.splice(2, 1);
+        assert.equal(settings.items[2].action,'save');
+        settings.items.splice(2,1);
       }
       if (name === 'render parity across viewports scenes and overlays') {
         assert.deepEqual(result,fieldRenders[name]);
