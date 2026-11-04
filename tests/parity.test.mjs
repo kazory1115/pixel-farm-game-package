@@ -45,6 +45,8 @@ registerInteractionTests('standalone', { htmlPath:exported });
 
 test('original markup styles and image bytes are preserved', () => {
   const runtime=loadGame();
+  assert.ok(runtime.game,'the root entry must boot the game directly');
+  assert.doesNotMatch(runtime.html,/<meta[^>]+http-equiv=["']refresh["']|<iframe\b/i);
   const body=runtime.html.match(/<body>([\s\S]*?)<script/)[1];
   assert.equal(digest(body),baseline.markupHash);
   assert.equal(digest(fs.readFileSync(path.join(root,'styles/game.css'))),baseline.cssHash);
@@ -53,6 +55,7 @@ test('original markup styles and image bytes are preserved', () => {
 });
 
 test('standalone export has no local stylesheet script or image dependencies', () => {
+  assert.equal(path.basename(exported),'index.html');
   const html=fs.readFileSync(exported,'utf8');
   assert.doesNotMatch(html,/<script\s+src=|href="styles\/|assets\/game\//);
   assert.equal((html.match(/data:image\/png;base64,/g)||[]).length,54);

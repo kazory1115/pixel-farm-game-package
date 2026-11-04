@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 export const root = fileURLToPath(new URL('../', import.meta.url));
-export const entry = 'xiang-su-nong-chang-xiao-you-xi.html';
+export const entry = 'index.html';
 
 // Share the development entry's script order. There is no second module list.
 export async function build(outputDirectory = path.join(root, 'dist')) {

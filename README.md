@@ -1,10 +1,10 @@
 # 像素農場小遊戲
 
-星露谷式小農場遊戲，使用原生 JavaScript 與 Canvas。畫面、素材、遊戲規則和操作沿用原版，開發程式已拆成獨立模組。直接雙擊根目錄的 `xiang-su-nong-chang-xiao-you-xi.html` 就能玩，不需要安裝套件、架伺服器或連網。離線時字體會退回系統字體。
+星露谷式小農場遊戲，使用原生 JavaScript 與 Canvas。畫面、素材、遊戲規則和操作沿用原版，開發程式已拆成獨立模組。直接雙擊根目錄的 `index.html` 就能玩，不需要安裝套件、架伺服器或連網。離線時字體會退回系統字體。
 
 開發版需要保留 `src/`、`styles/` 和 `assets/game/` 的相對位置。如果只想分享一個 HTML 檔，使用下方的單檔匯出指令。
 
-GitHub Pages 使用 `master` 的 `/(root)` 發布時，根目錄的 `index.html` 會自動導向遊戲，直接開啟網站根網址就能遊玩。舊的完整遊戲網址仍可使用。
+開發、GitHub Pages 與單檔匯出統一使用 `index.html` 作為唯一入口。GitHub Pages 使用 `master` 的 `/(root)` 發布時，網站首頁直接載入遊戲，網址維持在網站根路徑。
 
 ## 怎麼玩
 
@@ -37,8 +37,7 @@ GitHub Pages 使用 `master` 的 `/(root)` 發布時，根目錄的 `index.html`
 
 | 位置 | 責任 |
 | --- | --- |
-| `index.html` | GitHub Pages 首頁入口，自動導向遊戲 |
-| `xiang-su-nong-chang-xiao-you-xi.html` | 頁面結構與 script 載入順序 |
+| `index.html` | 遊戲本體的頁面結構與 script 載入順序，也是 GitHub Pages 首頁 |
 | `styles/game.css` | 原版滿版版面、觸控按鈕與夜晚遮罩樣式 |
 | `src/config.js` | 地圖位置、作物、價格、工具與移動設定 |
 | `src/state.js` | 每局的農場、玩家、場景、面板、輸入與動物狀態 |
@@ -72,6 +71,6 @@ npm test
 npm run build
 ```
 
-匯出結果為 `dist/xiang-su-nong-chang-xiao-you-xi.html`。CSS、JavaScript 與圖片都會內嵌，可以單獨複製分享、雙擊開啟。Google Fonts 仍為選用的外部字體，離線有系統字體可用。
+匯出結果為 `dist/index.html`。CSS、JavaScript 與圖片都會內嵌，可以單獨複製分享、雙擊開啟。Google Fonts 仍為選用的外部字體，離線有系統字體可用。
 
 回歸測試以重構前的原版建立固定快照，涵蓋農作、商店、市集、換日、目標、移動、碰撞、鍵盤、觸控與七種視窗尺寸。測試也核對 DOM、CSS、54 張圖片的位元組與 Canvas 繪圖指令。這是模擬瀏覽器環境的比對，不取代實際瀏覽器的視覺與裝置測試。
