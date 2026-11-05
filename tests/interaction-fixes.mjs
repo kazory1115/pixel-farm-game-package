@@ -93,14 +93,15 @@ export function registerInteractionTests(format, options) {
     api.call('say',text);
     api.key('z');
     const first=dialogueLines(api);
-    assert.equal(first,text.slice(0,32));
+    const end=api.game.dialogue.currentPage().end;
+    assert.equal(first,text.slice(0,end));
     api.key('z',true);
     assert.equal(api.get('dlg').pageStart,0);
     api.emit('btnA','click');
-    assert.equal(api.get('dlg').pageStart,32);
+    assert.equal(api.get('dlg').pageStart,end);
     assert.equal(api.get('dlg').active,true);
     api.emit('btnA','click');
-    assert.equal(dialogueLines(api),text.slice(32));
+    assert.equal(dialogueLines(api),text.slice(end));
     api.emit('btnA','click');
     assert.equal(api.get('dlg').active,false);
     api.call('say',text); api.call('pressB');

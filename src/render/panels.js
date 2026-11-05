@@ -34,6 +34,23 @@
       }
     }
 
+    function drawNotice(){
+      const notice=store.notice;
+      if(!notice || Date.now()>=notice.until || store.dialogue.active || store.menu.open || store.market.open || store.shop.open) return;
+      const lines=[''];
+      for(const char of Array.from(notice.text)){
+        if(surface.measureText(lines[lines.length-1]+char,7)>view.width-28){
+          if(lines.length===2){ lines[1]=lines[1].slice(0,-1)+'…'; break; }
+          lines.push('');
+        }
+        lines[lines.length-1]+=char;
+      }
+      const width=Math.min(view.width-8,Math.max(64,Math.ceil(Math.max(...lines.map(line=>surface.measureText(line,7))))+18));
+      panel(4,33,width,lines.length*10+12);
+      surface.ctx.font='7px sans-serif';
+      lines.forEach((line,i)=>surface.txt(line,13,47+i*10,'#28283c'));
+    }
+
     function drawDialog(){
       // The lower corners belong to the touch controls at every button size.
       var W = view.width - 8, Y = 20;
@@ -122,6 +139,6 @@
       surface.txt(store.market.msg || 'A 賣出 · B 離開 · 價格每天會變', X + W / 2, Y + H - 5, store.market.msg ? '#a4443c' : '#6a675a', 'center');
     }
 
-    return { panel, panelGeom, menuRowHeight, drawHUD, drawDialog, drawMenu, drawShopPanel, drawMarketPanel };
+    return { panel, panelGeom, menuRowHeight, drawHUD, drawNotice, drawDialog, drawMenu, drawShopPanel, drawMarketPanel };
   };
 })(window.PixelFarm);

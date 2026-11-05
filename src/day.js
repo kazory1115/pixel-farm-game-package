@@ -22,7 +22,7 @@
         if (Math.random() < 0.7) animals.layEgg();
         el('nightfade').className = 'nightfade';
         store.sleeping = false;
-        dialogue.say(store.farm.rainy ? '第 ' + store.farm.day + ' 天：下雨了！作物自動澆水' : '第 ' + store.farm.day + ' 天：又是適合種田的好天氣');
+        dialogue.notify(store.farm.rainy ? '第 ' + store.farm.day + ' 天：下雨了！作物自動澆水' : '第 ' + store.farm.day + ' 天：又是適合種田的好天氣');
         goals.checkGoals();
         persistence.save();
       }, 1500);

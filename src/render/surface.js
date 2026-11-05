@@ -9,14 +9,18 @@
     var disp = document.getElementById('game');
     var dctx = disp.getContext('2d'); dctx.imageSmoothingEnabled = false;
     var fontFamily = '"DotGothic16","PingFang TC","Microsoft JhengHei",sans-serif';
+    let controlInset=0;
     function setFontFamily(family){ fontFamily = family; }
     var textQueue = [];
     function drawFit(img, cx, cy, h, flip){
       if (!img || !img.complete || !img.naturalWidth) return;
-      var w = h * img.naturalWidth / img.naturalHeight;
+      // The generated sprinkler includes transparent packing space around its sprite.
+      var frame = img.spriteFrame;
+      var w = h * (frame ? frame[2]/frame[3] : img.naturalWidth/img.naturalHeight);
       ctx.save();
       if (flip){ ctx.translate(cx, 0); ctx.scale(-1, 1); cx = 0; }
-      ctx.drawImage(img, cx - w/2, cy - h, w, h);
+      if (frame) ctx.drawImage(img,frame[0],frame[1],frame[2],frame[3],cx-w/2,cy-h,w,h);
+      else ctx.drawImage(img, cx - w/2, cy - h, w, h);
       ctx.restore();
     }
 
@@ -41,6 +45,14 @@
       var dy = tr ? y * tr.d + tr.f : y;
       textQueue.push({ s: String(s), x: dx, y: dy, color: color, align: align || 'left',
         size: m ? parseFloat(m[1]) : 9, bold: /bold/.test(ctx.font || '') });
+    }
+
+    function measureText(s, size){
+      dctx.save();
+      dctx.font = (size * view.scaleY) + 'px ' + fontFamily;
+      var width = dctx.measureText(s).width / view.scaleX;
+      dctx.restore();
+      return width;
     }
 
     function flushText(clipWorld){
@@ -72,17 +84,23 @@
       var stage = el('stage'), scr = el('screen');
       var aw = stage.clientWidth, ah = stage.clientHeight;
       if (!aw || !ah || !scr) return;
-      scr.style.width = aw + 'px';
-      scr.style.height = ah + 'px';
+      scr.style.width = '100%';
+      scr.style.height = '100%';
       var aspect = aw / ah;
       if (aspect >= 1){
         view.height = 160; view.width = Math.round(view.height * aspect);
         if (view.width > 336){ view.width = 336; view.height = Math.round(view.width / aspect); }
+        if(view.height<112){ view.height=112; view.width=Math.round(view.height*aspect); }
       } else {
         view.width = 176; view.height = Math.round(view.width / aspect);
         if (view.height > 400){ view.height = 400; view.width = Math.round(view.height * aspect); }
       }
       view.worldHeight = view.height - 16;
+      if(window.getComputedStyle){
+        const bounds=disp.getBoundingClientRect();
+        const tops=Array.from(document.querySelectorAll('.padbar button')).map(button=>button.getBoundingClientRect().top);
+        controlInset=Math.min(view.worldHeight-48,Math.max(0,(bounds.bottom-Math.min(...tops))/bounds.height*view.height));
+      }
       if (sc.width !== view.width) sc.width = view.width;
       if (sc.height !== view.height) sc.height = view.height;
       ctx.imageSmoothingEnabled = false;
@@ -94,6 +112,6 @@
       view.scaleX = disp.width / view.width; view.scaleY = disp.height / view.height;
     }
 
-    return { drawFit, drawTile, drawTileFlat, px, txt, flushText, present, fitScreen, setFontFamily, view, ctx, dctx, sceneCanvas: sc, canvas: disp, textQueue };
+    return { drawFit, drawTile, drawTileFlat, px, txt, measureText, flushText, present, fitScreen, setFontFamily, view, ctx, dctx, sceneCanvas: sc, canvas: disp, textQueue, get controlInset(){ return controlInset; } };
   };
 })(window.PixelFarm);

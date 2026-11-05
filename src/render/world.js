@@ -47,7 +47,9 @@
       surface.ctx.save();
       surface.ctx.beginPath(); surface.ctx.rect(0, 16, view.width, view.worldHeight); surface.ctx.clip();
       /* 室內固定 240×144，置中放進目前視野；多出來的四周鋪同色系木地板，不露邊 */
-      var ox = (view.width - 240) / 2, oy = (view.worldHeight - 144) / 2;
+      var safeHeight=view.worldHeight-surface.controlInset;
+      var ox = view.width>=240 ? (view.width-240)/2 : Math.max(view.width-240,Math.min(0,view.width/2-store.player.px-8));
+      var oy = safeHeight>=144 ? (safeHeight-144)/2 : Math.max(safeHeight-144,Math.min(0,safeHeight/2-store.player.py-8));
       surface.ctx.translate(ox, 16 + oy);
       surface.px(-ox, -oy, view.width, view.worldHeight, '#ac7f4a');
       for (var r = 0; r < 9; r++){
@@ -93,7 +95,8 @@
       var ww = config.COLS * config.TILE, wh = config.ROWS * config.TILE;
       /* 視野比世界小：攝影機跟隨玩家並夾在世界內；視野比世界大：世界置中，邊界外由草地延伸填滿 */
       view.camera.x = view.width >= ww ? (ww - view.width) / 2 : Math.max(0, Math.min(ww - view.width, store.player.px + 8 - view.width / 2));
-      view.camera.y = view.worldHeight >= wh ? (wh - view.worldHeight) / 2 : Math.max(0, Math.min(wh - view.worldHeight, store.player.py + 8 - view.worldHeight / 2));
+      var safeHeight=view.worldHeight-surface.controlInset;
+      view.camera.y = safeHeight >= wh ? (wh-safeHeight)/2 : Math.max(0,Math.min(wh-safeHeight,store.player.py+8-safeHeight/2));
     }
 
     function drawHouse(){
@@ -182,20 +185,19 @@
         return;
       }
       for (var i = 4; i < 15; i += 4) surface.px(x + 3, y + i, 10, 1, '#55321f');
-      if (p.watered) surface.px(x + 1, y + 1, 14, 14, 'rgba(25,40,75,.3)');
+      if (p.watered || (p.crop && store.farm.rainy)){
+        surface.px(x + 1, y + 1, 14, 14, 'rgba(29,36,48,.55)');
+        surface.px(x + 2, y + 12, 3, 1, '#83a9a4');
+        surface.px(x + 11, y + 5, 2, 1, '#83a9a4');
+      }
     }
 
     function drawWaterStatus(c, r, p){
-      if (p.growth >= config.CROPS[p.crop].days) return;
+      if (p.watered || store.farm.rainy || p.growth >= config.CROPS[p.crop].days) return;
       var x = c * config.TILE + 10, y = r * config.TILE + 2;
       surface.px(x - 1, y - 1, 6, 7, '#352b26');
-      if (p.watered || store.farm.rainy){
-        surface.px(x, y + 3, 2, 2, '#7fd8d0');
-        surface.px(x + 2, y + 1, 2, 3, '#7fd8d0');
-      } else {
-        surface.px(x + 1, y, 2, 2, '#8fd0f0');
-        surface.px(x, y + 2, 4, 3, '#5aa8dd');
-      }
+      surface.px(x + 1, y, 2, 2, '#8fd0f0');
+      surface.px(x, y + 2, 4, 3, '#5aa8dd');
     }
 
     function drawCropPlant(c, r, p){
@@ -204,10 +206,13 @@
       var frac = p.growth / crop.days;
       if (frac >= 1){ surface.drawFit(images['item_' + p.crop], cx, by + 1, 15); return; }
       var s = 0.5 + frac * 0.6;
+      var wet = p.watered || store.farm.rainy;
       surface.ctx.save(); surface.ctx.translate(cx, by); surface.ctx.scale(s, s);
-      surface.px(-1, -6, 2, 6, '#3e7d2c');
-      surface.px(-5, -8, 5, 3, '#57a047'); surface.px(0, -9, 5, 3, '#57a047');
-      surface.px(-4, -11, 4, 3, '#6cb457'); surface.px(1, -12, 4, 3, '#6cb457');
+      surface.px(-1, wet ? -8 : -6, 2, wet ? 8 : 6, wet ? '#3e7d2c' : '#777943');
+      surface.px(-5, wet ? -10 : -6, 5, 3, wet ? '#57a047' : '#92914f');
+      surface.px(0, wet ? -11 : -7, 5, 3, wet ? '#57a047' : '#92914f');
+      surface.px(-4, wet ? -14 : -9, 4, 3, wet ? '#88cf63' : '#a6a667');
+      surface.px(1, wet ? -15 : -10, 4, 3, wet ? '#88cf63' : '#a6a667');
       if (frac > 0.55) surface.px(-1.5, -14, 3, 3, crop.color);
       surface.ctx.restore();
     }

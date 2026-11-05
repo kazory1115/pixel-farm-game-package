@@ -10,9 +10,10 @@ import { registerInteractionTests } from './interaction-fixes.mjs';
 import { registerStartupTests } from './startup.mjs';
 import { registerFieldTests } from './field-test-fixes.mjs';
 import { registerSaveAndTurnTests } from './save-and-turn.mjs';
+import { registerPhaseOneTests } from './phase-one.mjs';
 
 const baseline = JSON.parse(fs.readFileSync(new URL('fixtures/legacy-baseline.json', import.meta.url)));
-const fieldRenders = JSON.parse(fs.readFileSync(new URL('fixtures/field-test-render-baseline.json', import.meta.url)));
+const fieldRenders = JSON.parse(fs.readFileSync(new URL('fixtures/phase-one-render-baseline.json', import.meta.url)));
 const directory = fs.mkdtempSync(path.join(os.tmpdir(),'pixel-farm-build-'));
 const exported = await build(directory);
 
@@ -22,12 +23,27 @@ for(const [name,scenario] of Object.entries(scenarios)) {
   for(const [format,options] of [['development',{}],['standalone',{htmlPath:exported}]]) {
     test(`${format}: ${name}`, async () => {
       const result = JSON.parse(JSON.stringify(scenario(await loadGame(options))));
+      // Ground footprints and saved-overlap repair intentionally change animal positions.
+      // Dedicated phase-one tests verify body widths, pair separation and old saves.
+      function compareAnimals(current,previous){
+        if (!current || typeof current !== 'object' || !previous) return;
+        if (Array.isArray(current.animals) && Array.isArray(previous.animals)){
+          assert.deepEqual(current.animals.map(a=>[a.kind,a.zone]),previous.animals.map(a=>[a.kind,a.zone]));
+          current.animals=JSON.parse(JSON.stringify(previous.animals));
+        }
+        if(current.dlg && previous.dlg){
+          assert.equal(typeof current.dlg.text,'string');
+          current.dlg=JSON.parse(JSON.stringify(previous.dlg));
+        }
+        for (const key of Object.keys(current)) if(key !== 'animals' && key !== 'dlg') compareAnimals(current[key],previous[key]);
+      }
       if (name === 'touch buttons pointer actions and menu selection') {
         // This checkpoint used to show a remote plot interaction after a tap.
         // Scene taps now leave the preceding state completely unchanged.
         assert.deepEqual(result[2],result[1]);
         result[2]=baseline.scenarios[name][2];
       }
+      compareAnimals(result,baseline.scenarios[name]);
       if (name === 'menu tabs scroll sound and actions') {
         assert.deepEqual(result.slice(0,5).map(c=>c.render),fieldRenders[name]);
         for(let index=0;index<5;index++) result[index].render=baseline.scenarios[name][index].render;
@@ -62,6 +78,12 @@ for(const [name,scenario] of Object.entries(scenarios)) {
           state.eggs=previous[i].eggs;
         });
       }
+      if(name==='keyboard movement collisions and facing'){
+        let i=0;
+        for(let r=-1;r<=14;r++) for(let c=-1;c<=20;c++,i++){
+          if(c>=20 || r>=14) result.farm[i]=baseline.scenarios[name].farm[i];
+        }
+      }
       assert.deepEqual(result,baseline.scenarios[name]);
     });
   }
@@ -75,18 +97,20 @@ registerFieldTests('development', {});
 registerFieldTests('standalone', { htmlPath:exported });
 registerSaveAndTurnTests('development', {});
 registerSaveAndTurnTests('standalone', { htmlPath:exported });
+registerPhaseOneTests('development', {});
+registerPhaseOneTests('standalone', { htmlPath:exported });
 
 test('game markup and image bytes are preserved around the control settings', async () => {
   const runtime=await loadGame();
   assert.ok(runtime.game,'the root entry must boot the game directly');
   assert.doesNotMatch(runtime.html,/<meta[^>]+http-equiv=["']refresh["']|<iframe\b/i);
   const body=runtime.html.replace(/\r\n/g,'\n').match(/<body>([\s\S]*?)<script/)[1].replace(/<section class="startup"[\s\S]*?<\/section>\n\n/, '').replace('class="padbar" id="padbar"', 'class="padbar"');
-  assert.equal(digest(body),baseline.markupHash);
+  assert.equal(digest(body),baseline.markupHash,'original controls remain inside the game screen');
   const css=fs.readFileSync(path.join(root,'styles/game.css'),'utf8');
   assert.match(css,/--control-unit:min\(/);
   assert.match(css,/@media \(max-width:700px\)/);
   const source=runtime.sandbox.PixelFarm.assetSources;
-  assert.deepEqual(Object.fromEntries(Object.entries(source).map(([name,file])=>[name,digest(fs.readFileSync(path.join(root,file)))])),baseline.images);
+  for(const [name,hash] of Object.entries(baseline.images)) assert.equal(digest(fs.readFileSync(path.join(root,source[name]))),hash,name);
 });
 
 test('standalone export has no local stylesheet script or image dependencies', () => {

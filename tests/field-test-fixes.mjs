@@ -70,7 +70,9 @@ export function registerFieldTests(format, options) {
     api.call('pressB'); api.key('2'); api.call('pressA'); api.render();
     assert.equal(p.watered,true);
     assert.ok(!api.calls.some(c => c[1]==='fillStyle' && c[2]==='#5aa8dd'));
-    assert.ok(api.calls.some(c => c[1]==='fillStyle' && c[2]==='#7fd8d0'));
+    assert.ok(!api.calls.some(c => c[1]==='fillStyle' && c[2]==='#7fd8d0'),'watered crops have no persistent badge');
+    assert.ok(api.calls.some(c => c[1]==='fillStyle' && c[2]==='rgba(29,36,48,.55)'));
+    assert.ok(api.calls.some(c => c[1]==='fillStyle' && c[2]==='#88cf63'));
     api.call('pressB'); api.call('pressA');
     assert.equal(api.get('dlg').text,'今天已經澆過水了');
     Object.assign(api.call('plotAt',3,8),{tilled:true,crop:'carrot',growth:0,watered:false});

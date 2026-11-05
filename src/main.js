@@ -10,7 +10,7 @@
     const world = PixelFarm.createWorld({ config, store });
     const audio = PixelFarm.createAudio({ store, window });
     const surface = PixelFarm.createSurface({ config, window, document });
-    const dialogue = PixelFarm.createDialogue({ store, audio, view: surface.view });
+    const dialogue = PixelFarm.createDialogue({ store, audio, view: surface.view, measureText:surface.measureText });
     const goals = PixelFarm.createGoals({ store, audio, dialogue });
     const tools = PixelFarm.createTools({ config, store, audio });
     const animals = PixelFarm.createAnimals({ config, store, world });
@@ -22,7 +22,7 @@
     const menu = PixelFarm.createMenu({ config, store, tools, day, audio, goals, persistence, window, document });
     const worldView = PixelFarm.createWorldView({ config, store, world, surface, images });
     const panels = PixelFarm.createPanels({ config, store, surface, images, tools, menu, commerce, dialogue });
-    const renderer = PixelFarm.createRenderer({ config, store, world, player, surface, worldView, panels, images });
+    const renderer = PixelFarm.createRenderer({ config, store, world, player, farming, surface, worldView, panels, images });
     const input = PixelFarm.createInput({ config, store, surface, panels, player, farming, tools, menu, commerce, dialogue, audio, window, document });
     const startup = PixelFarm.createStartup({ window, document });
     const welcomeText = '歡迎來到像素農場！北邊有商店、南邊有市集，按 START 看說明';
@@ -61,10 +61,13 @@
         window.addEventListener('resize', surface.fitScreen);
         window.addEventListener('orientationchange', surface.fitScreen);
         if (window.visualViewport) window.visualViewport.addEventListener('resize', surface.fitScreen);
+        if(window.ResizeObserver) new window.ResizeObserver(surface.fitScreen).observe(document.getElementById('stage'));
         surface.fitScreen();
         const restored = persistence.load();
+        animals.reconcilePositions();
         persistence.bind();
-        dialogue.say(restored ? '歡迎回來！已接續第 ' + store.farm.day + ' 天的農場進度' : welcomeText);
+        if(restored) dialogue.notify('歡迎回來！已接續第 '+store.farm.day+' 天的農場進度');
+        else dialogue.say(welcomeText);
         lastTime = window.performance.now();
         window.requestAnimationFrame(loop);
         return true;

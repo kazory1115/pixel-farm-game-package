@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createRenderer = function ({ config, store, world, player, surface, worldView, panels, images }) {
+  PixelFarm.createRenderer = function ({ config, store, world, player, farming, surface, worldView, panels, images }) {
     const view = surface.view;
     function draw(){
       surface.textQueue.length = 0;
@@ -12,6 +12,7 @@
         surface.present(true);
         surface.ctx.clearRect(0, 0, view.width, view.height);
         panels.drawHUD();
+      panels.drawNotice();
         if (store.menu.open) panels.drawMenu();
         else if (store.shop.open) panels.drawShopPanel();
         else if (store.dialogue.active) panels.drawDialog();
@@ -94,6 +95,15 @@
           }
         }
       });
+      for (var wi=farming.waterEffects.length-1; wi>=0; wi--){
+        var effect=farming.waterEffects[wi], age=(Date.now()-effect.started)/650;
+        if (age>=1){ farming.waterEffects.splice(wi,1); continue; }
+        var wx=effect.c*config.TILE+8, wy=effect.r*config.TILE+8;
+        for (var drop=0; drop<6; drop++){
+          var angle=drop*Math.PI/3;
+          surface.px(Math.round(wx+Math.cos(angle)*(2+age*8)),Math.round(wy+Math.sin(angle)*(2+age*5)-Math.sin(age*Math.PI)*4),1,2,'#d4f4ff');
+        }
+      }
       if (store.farm.rainy){
         surface.ctx.strokeStyle = 'rgba(190,220,255,.55)'; surface.ctx.lineWidth = 1;
         var t = Date.now() / 14;
@@ -109,6 +119,7 @@
       surface.present(true);
       surface.ctx.clearRect(0, 0, view.width, view.height);
       panels.drawHUD();
+      panels.drawNotice();
       if (store.menu.open) panels.drawMenu();
       else if (store.market.open) panels.drawMarketPanel();
       else if (store.dialogue.active) panels.drawDialog();

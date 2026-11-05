@@ -12,6 +12,8 @@
     } catch (_) { /* 私密模式或本機檔案可能不允許儲存 */ }
     function applyControlSize(){
       document.getElementById('padbar').style.setProperty('--control-scale', String(controlSizes[controlSizeIndex] / 100));
+      // Changing the deck's height changes the available world viewport.
+      window.dispatchEvent?.(new window.Event('resize'));
     }
     applyControlSize();
 

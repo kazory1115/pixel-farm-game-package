@@ -1,7 +1,13 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createDialogue = function ({ store, audio, view }) {
+  PixelFarm.createDialogue = function ({ store, audio, view, measureText }) {
+    function notify(text){
+      store.notice={text:text,until:Date.now()+1600};
+      // Keep the last feedback available to accessibility/debugging consumers.
+      store.dialogue.text=text;
+      store.dialogue.shown=0; store.dialogue.pageStart=0; store.dialogue.t=0; store.dialogue.active=false;
+    }
     function say(text){
       store.dialogue.text = text;
       store.dialogue.shown = 0;
@@ -13,11 +19,20 @@
     // Keep an absolute text offset so a resize never skips unread text.
     function currentPage(){
       const dlg = store.dialogue;
-      const per = Math.max(8, Math.floor((view.width - 24) / 9));
-      const characters = Array.from(dlg.text.slice(dlg.pageStart)).slice(0, per * 2);
-      const end = dlg.pageStart + characters.join('').length;
-      const visible = Array.from(dlg.text.slice(dlg.pageStart, Math.min(dlg.shown, end)).replace(/[\uD800-\uDBFF]$/, ''));
-      return { per, end, lines:[visible.slice(0, per).join(''), visible.slice(per).join('')] };
+      const width = Math.max(9, view.width - 34);
+      const lines = ['', ''];
+      let end = dlg.pageStart;
+      const visible = [];
+      for (let row = 0; row < 2; row++){
+        const start = end;
+        for (const character of Array.from(dlg.text.slice(start))){
+          if (lines[row] && measureText(lines[row] + character, 9) > width) break;
+          lines[row] += character;
+          end += character.length;
+        }
+        visible.push(dlg.text.slice(start, Math.min(dlg.shown, end)).replace(/[\uD800-\uDBFF]$/, ''));
+      }
+      return { end, lines:visible };
     }
 
     function advance(){
@@ -43,6 +58,6 @@
       }
     }
 
-    return { say, updateDialog, currentPage, advance };
+    return { say, notify, updateDialog, currentPage, advance };
   };
 })(window.PixelFarm);
