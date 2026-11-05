@@ -1,0 +1,7 @@
+Use case: stylized-concept. Asset type: ONE transparent pixel-art sprinkler sprite for the same farming game as the provided watering can.
+Input image 1: strict STYLE REFERENCE, the game's existing watering can. Match its palette, pixel block size, solid almost-black chunky outline, sparse flat blue-gray metal shading, simple perspective and hand-drawn silhouette exactly. This is an expansion of that same sprite set, not a new art direction.
+Primary request: a small functional garden sprinkler, short blue-gray iron stem, flat squat circular base, short horizontal metal bar with two upturned spray nozzles. All the same muted blue-gray metal as the reference watering can, with one tiny warm brass connector at most. No vivid turquoise, no ornate gold or copper machinery. Broad compact low silhouette, simple 32x32-pixel-style design, reads cleanly at 22px in-game.
+Composition: ONE centered isolated object entirely visible with small transparent margin. Square canvas. Genuinely transparent background, no beige backdrop. No water spray, text, watermark, ground, shadows or other objects. No smoothing, glossy 3D, gradients or new colors. Match the reference as closely as possible.
+
+Generated with built-in image_gen; strict style reference: assets/game/item_can.png.
+Used output: item_sprinkler.png. Transparent sprite frame: x=204 y=390 w=844 h=616.

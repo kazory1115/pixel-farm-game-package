@@ -20,6 +20,7 @@
   "item_seeds": "assets/game/item_seeds.png",
   "item_hoe": "assets/game/item_hoe.png",
   "item_can": "assets/game/item_can.png",
+  "item_sprinkler": "assets/game/item_sprinkler.png",
   "item_crate": "assets/game/item_crate.png",
   "item_basket": "assets/game/item_basket.png",
   "animal_chicken_0": "assets/game/animal_chicken_0.png",
@@ -84,6 +85,7 @@
             if (error) reject(error);
             else {
               images[name] = image;
+              if (name === 'item_sprinkler') image.spriteFrame = [204,390,844,616];
               completed++;
               if (!failed) onProgress(completed, names.length);
               resolve(image);

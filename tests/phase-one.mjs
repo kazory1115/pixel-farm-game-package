@@ -9,8 +9,8 @@ export function registerPhaseOneTests(format, options){
     test(`${format}: phase one: automatically recovers from tile_water ${imageMode}`,async()=>{
       const api=await loadGame({...options,imageMode});
       assert.equal(await api.ready,true);
-      assert.equal(api.imageElements.length,55);
-      assert.equal(api.sandbox.document.getElementById('loadProgress').value,54);
+      assert.equal(api.imageElements.length,56);
+      assert.equal(api.sandbox.document.getElementById('loadProgress').value,55);
       assert.equal(api.pendingTimers(),0);
       api.tick();
       assert.equal(api.game.startup.phase,'ready');
@@ -66,4 +66,35 @@ export function registerPhaseOneTests(format, options){
     for(let j=0;j<pen.length;j++) for(let k=j+1;k<pen.length;k++) assert.equal(restored.game.world.animalsOverlap(pen[j],pen[j].x,pen[j].y,pen[k]),false);
   });
 
+  check('bundle deliveries consume one crop, persist, and require both collection and earnings',async api=>{
+    const farm=api.get('state');
+    farm.coins=10000;
+    assert.equal(api.game.goals.claimBundle(),false,'money alone cannot complete the bundle');
+    assert.equal(api.game.goals.donate('wheat'),false);
+    farm.produce.wheat=2;
+    api.get('menu').open=true; api.get('menu').tab=2; api.get('menu').idx=1;
+    api.call('menuActivate');
+    assert.equal(farm.produce.wheat,1);
+    assert.equal(api.game.goals.donate('wheat'),false,'one donation per crop');
+    let saved=api.sandbox.localStorage.getItem('pixelFarm.save.v1');
+    const resumed=await loadGame({...options,storage:new Map([['pixelFarm.save.v1',saved]])});
+    assert.equal(resumed.get('state').goalsDone.bundle_wheat,true);
+    assert.equal(resumed.get('state').produce.wheat,1);
+    for(const id of ['carrot','cabbage']){
+      farm.produce[id]=1; assert.equal(api.game.goals.donate(id),true); assert.equal(farm.produce[id],0);
+    }
+    farm.totalEarned=299; assert.equal(api.game.goals.claimBundle(),false);
+    farm.totalEarned=300;
+    api.get('menu').idx=5; api.call('menuActivate');
+    assert.equal(farm.sprinkler,true); assert.equal(farm.seeds.tomato,3);
+    assert.equal(farm.goalsDone.bundleReward,true);
+    assert.equal(api.get('menu').open,false);
+    assert.equal(api.game.goals.claimBundle(),false);
+    assert.equal(farm.seeds.tomato,3);
+    saved=api.sandbox.localStorage.getItem('pixelFarm.save.v1');
+    const claimed=await loadGame({...options,storage:new Map([['pixelFarm.save.v1',saved]])});
+    assert.equal(claimed.game.goals.claimBundle(),false);
+    assert.equal(claimed.get('state').sprinkler,true);
+    assert.equal(claimed.get('state').seeds.tomato,3);
+  });
 }

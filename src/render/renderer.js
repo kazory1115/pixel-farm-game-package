@@ -67,6 +67,7 @@
       worldView.drawHouse();
       worldView.drawShopBuilding();
       worldView.drawMarket();
+      worldView.drawSprinkler();
       worldView.drawFences();
       store.eggs.forEach(function(e){ surface.drawFit(images.item_egg, e.c * config.TILE + 8, e.r * config.TILE + 15, 11); });
       var ents = store.animals.map(function(a){ return { y: a.y, a: a }; });

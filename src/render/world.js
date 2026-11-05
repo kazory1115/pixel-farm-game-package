@@ -217,6 +217,12 @@
       surface.ctx.restore();
     }
 
-    return { drawFigure, drawShopBuilding, drawMarket, drawShopInterior, computeCam, drawHouse, drawTree, drawFences, drawPlot, drawCropPlant, drawWaterStatus };
+    function drawSprinkler(){
+      if (!store.farm.sprinkler) return;
+      // An installed upgrade stands beside the field, without taking a crop tile.
+      surface.drawFit(images.item_sprinkler, 9 * config.TILE + 8, 10 * config.TILE + 14, 18);
+    }
+
+    return { drawFigure, drawShopBuilding, drawMarket, drawShopInterior, computeCam, drawHouse, drawTree, drawFences, drawPlot, drawCropPlant, drawWaterStatus, drawSprinkler };
   };
 })(window.PixelFarm);

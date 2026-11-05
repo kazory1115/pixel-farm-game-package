@@ -40,9 +40,9 @@
         return rows;
       }
       if (store.menu.tab === 2){
-        return goals.items.map(function(g){
+        return goals.bundleRows().concat(goals.items.map(function(g){
           return { label: (store.farm.goalsDone[g.id] || g.test() ? '✓ ' : '・') + g.text, info: true };
-        });
+        }));
       }
       if (store.menu.tab === 3){
         return [
@@ -77,6 +77,8 @@
       var it = items[store.menu.idx];
       if (!it) return;
       if (it.disabled || it.info){ audio.sfx.error(); return; }
+      if (it.action === 'donate'){ goals.donate(it.crop); persistence.save(); return; }
+      if (it.action === 'bundleReward'){ goals.claimBundle(); persistence.save(); return; }
       if (store.menu.tab === 0 && it.opt){
         tools.applyToolOpt(it.opt); audio.sfx.plant(); store.menu.open = false;
         return;

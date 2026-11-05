@@ -54,6 +54,8 @@ for(const [name,scenario] of Object.entries(scenarios)) {
         settings.items.splice(2, 1);
         assert.equal(settings.items[2].action,'save');
         settings.items.splice(2,1);
+        assert.equal(result[2].items[0].label,'田園出貨套組');
+        result[2].items.splice(0,7);
       }
       if (name === 'render parity across viewports scenes and overlays') {
         assert.deepEqual(result,fieldRenders[name]);
@@ -111,13 +113,14 @@ test('game markup and image bytes are preserved around the control settings', as
   assert.match(css,/@media \(max-width:700px\)/);
   const source=runtime.sandbox.PixelFarm.assetSources;
   for(const [name,hash] of Object.entries(baseline.images)) assert.equal(digest(fs.readFileSync(path.join(root,source[name]))),hash,name);
+  assert.ok(source.item_sprinkler);
 });
 
 test('standalone export has no local stylesheet script or image dependencies', () => {
   assert.equal(path.basename(exported),'index.html');
   const html=fs.readFileSync(exported,'utf8');
   assert.doesNotMatch(html,/<script\s+src=|href="styles\/|assets\/game\//);
-  assert.equal((html.match(/data:image\/png;base64,/g)||[]).length,54);
+  assert.equal((html.match(/data:image\/png;base64,/g)||[]).length,55);
 });
 
 test('only PixelFarm is global; new instances own their state; start is idempotent', async () => {

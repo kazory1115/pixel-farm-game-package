@@ -11,7 +11,7 @@
     const audio = PixelFarm.createAudio({ store, window });
     const surface = PixelFarm.createSurface({ config, window, document });
     const dialogue = PixelFarm.createDialogue({ store, audio, view: surface.view, measureText:surface.measureText });
-    const goals = PixelFarm.createGoals({ store, audio, dialogue });
+    const goals = PixelFarm.createGoals({ config, store, audio, dialogue });
     const tools = PixelFarm.createTools({ config, store, audio });
     const animals = PixelFarm.createAnimals({ config, store, world });
     const persistence = PixelFarm.createPersistence({ config, store, world, window, document });

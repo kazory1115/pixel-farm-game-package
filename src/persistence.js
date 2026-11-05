@@ -26,7 +26,7 @@
       if (!config.TOOL_CYCLE.some(o => o.tool === f.tool) || !config.CROP_IDS.includes(f.seedCrop)) return false;
       if (!object(f.seeds) || !object(f.produce) || !object(f.goalsDone)) return false;
       if (!config.CROP_IDS.every(id => count(f.seeds[id])) || !config.PRICE_KEYS.every(id => count(f.produce[id]))) return false;
-      if (!Object.entries(f.goalsDone).every(([k,v]) => ['g1','g2','g3','g4','allDone','pumpkinPlanted'].includes(k) && typeof v === 'boolean')) return false;
+      if (!Object.entries(f.goalsDone).every(([k,v]) => ['g1','g2','g3','g4','allDone','pumpkinPlanted','bundle_wheat','bundle_carrot','bundle_cabbage','bundleReward'].includes(k) && typeof v === 'boolean')) return false;
       for (const [position,p] of Object.entries(data.plots)){
         if (!/^\d+,\d+$/.test(position)) return false;
         const [c,r] = position.split(',').map(Number);
