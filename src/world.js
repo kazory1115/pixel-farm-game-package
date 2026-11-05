@@ -20,6 +20,7 @@
     function isStall(c, r){ return config.STALLS.some(function(s){ return s.c === c && s.r === r; }); }
     function isTree(c, r){ return config.TREES.some(function(t){ return t.c === c && t.r === r; }); }
     function isPath(c, r){
+      if(r===8 && c>=10 && c<=26 || c===26 && r>=5 && r<=8 || r===5 && c===27) return true;
       if (r === config.PEN.gate.r && c >= config.PEN.gate.c - 1 && c <= config.PEN.gate.c + 1) return true;
       if (r === 5 && c >= 1 && c <= 12) return true;   /* 橫向石板路 */
       if (c === 10 && r >= 5 && r <= 10) return true;  /* 縱向石板路 */
@@ -36,6 +37,7 @@
     function isSolid(c, r){
       if (c < 0 || r < 0 || c >= config.COLS || r >= config.ROWS) return true;
       return isPond(c, r) || isFence(c, r) || isHouse(c, r) || isShop(c, r) || isStall(c, r) || isTree(c, r) ||
+             config.NPCS.some(n=>n.scene==='farm' && n.c===c && n.r===r) ||
              (c === config.SIGN.c && r === config.SIGN.r) ||
              (c === config.SCARECROW.c && r === config.SCARECROW.r) ||
              (c === config.WELL.c && r === config.WELL.r);
@@ -52,7 +54,14 @@
       if (r >= 6 && r <= 7 && c >= 11) return true;           /* 木箱堆下排 */
       return false;
     }
-    function solidAt(c, r){ return store.scene === 'shop' ? isSolidShop(c, r) : isSolid(c, r); }
+    function isSolidMarket(c,r){
+      if(c<0 || r<0 || c>=config.TOWN.cols || r>=config.TOWN.rows) return true;
+      if(c>=21 || r<2 || r===15 || (c===0 && r!==8)) return true;
+      return config.TOWN.stalls.some(s=>s.c===c && s.r===r) ||
+        config.NPCS.some(n=>n.scene==='market' && n.c===c && n.r===r) ||
+        c===config.TOWN.board.c && r===config.TOWN.board.r || c===20 && r===12 || r===12 && c>=18 && c<=19 || c===4 && r===11 || c===19 && r===10;
+    }
+    function solidAt(c, r){ return store.scene === 'shop' ? isSolidShop(c,r) : store.scene==='market' ? isSolidMarket(c,r) : isSolid(c,r); }
     function segmentDistance(x, y, x0, y0, x1, y1){
       var dx = x1 - x0, dy = y1 - y0;
       var length2 = dx * dx + dy * dy;
@@ -94,6 +103,6 @@
     }
     function hash2(c, r){ var x = Math.sin(c * 127.1 + r * 311.7) * 43758.5453; return x - Math.floor(x); }
 
-    return { isPlot, isPond, isFence, isHouse, isShop, isStall, isTree, isPath, isSand, isSolid, isSolidShop, solidAt, segmentDistance, animalRadius, animalWidth, animalIntersectsSegment, animalsOverlap, animalOnStep, animalBlocksStep, playerClearance, overlapsPlayer, hash2 };
+    return { isPlot, isPond, isFence, isHouse, isShop, isStall, isTree, isPath, isSand, isSolid, isSolidShop, isSolidMarket, solidAt, segmentDistance, animalRadius, animalWidth, animalIntersectsSegment, animalsOverlap, animalOnStep, animalBlocksStep, playerClearance, overlapsPlayer, hash2 };
   };
 })(window.PixelFarm);

@@ -95,6 +95,11 @@
         var k = e.key.toLowerCase();
         if (['arrowup','arrowdown','arrowleft','arrowright',' '].indexOf(k) >= 0) e.preventDefault();
         store.input.keys[k] = true;
+        if(k==='m' && !e.repeat && !store.sleeping){
+          if(store.menu.open && store.menu.tab===5) store.menu.open=false;
+          else { store.shop.open=store.market.open=false; store.dialogue.active=false; store.menu.open=true; store.menu.tab=5; store.menu.idx=store.menu.top=0; }
+          return;
+        }
         const direction = keyboardDirections[k];
         if (direction && navigate(direction)) return;
         if (direction) player.faceDirection(direction);

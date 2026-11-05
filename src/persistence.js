@@ -11,7 +11,7 @@
 
     function snapshot(){
       return {
-        farm:store.farm, plots:store.plots,
+        farm:store.farm, plots:store.plots, journey:store.journey,
         player:{ c:store.player.tx, r:store.player.ty, dir:store.player.dir },
         scene:store.scene, animals:store.animals, eggs:store.eggs,
         eggTimer:store.eggTimer, soundOn:store.soundOn
@@ -21,6 +21,13 @@
     function valid(data){
       if (!object(data) || !object(data.farm) || !object(data.plots) || !object(data.player)) return false;
       const f = data.farm;
+      if(data.journey !== undefined){
+        const j=data.journey;
+        if(!object(j) || !finite(j.minute) || j.minute<360 || j.minute>1320 || !count(j.forageDay) || j.forageDay>f.day || !object(j.quests) || !object(j.talked)) return false;
+        if(!Object.entries(j.quests).every(([id,status])=>config.NPCS.some(n=>n.id===id && n.crop) && ['accepted','done'].includes(status))) return false;
+        if(!Object.entries(j.talked).every(([id,value])=>(id==='stampReward' || config.NPCS.some(n=>n.id===id)) && typeof value==='boolean')) return false;
+        if(j.visited!==undefined && (!object(j.visited) || !Object.entries(j.visited).every(([id,value])=>['market','shop'].includes(id) && typeof value==='boolean'))) return false;
+      }
       if (!['day','coins','fertilizer','totalHarvest','totalEarned','eggsCollected'].every(k => count(f[k])) || f.day < 1) return false;
       if (typeof f.rainy !== 'boolean' || typeof f.sprinkler !== 'boolean' || typeof data.soundOn !== 'boolean') return false;
       if (!config.TOOL_CYCLE.some(o => o.tool === f.tool) || !config.CROP_IDS.includes(f.seedCrop)) return false;
@@ -36,8 +43,8 @@
       }
       const p = data.player;
       if (!Number.isInteger(p.c) || !Number.isInteger(p.r) || !Object.hasOwn(config.DIRS,p.dir)) return false;
-      if (data.scene !== 'farm' && data.scene !== 'shop') return false;
-      if ((data.scene === 'shop' ? world.isSolidShop : world.isSolid)(p.c,p.r)) return false;
+      if (!['farm','shop','market'].includes(data.scene)) return false;
+      if ((data.scene === 'shop' ? world.isSolidShop : data.scene==='market' ? world.isSolidMarket : world.isSolid)(p.c,p.r)) return false;
       if (!Array.isArray(data.eggs) || data.eggs.length > 4) return false;
       if (!data.eggs.every(e => object(e) && Number.isInteger(e.c) && Number.isInteger(e.r)
         && e.c > config.PEN.c0 && e.c < config.PEN.c1 && e.r > config.PEN.r0 && e.r < config.PEN.r1)) return false;
@@ -73,6 +80,7 @@
           Object.assign(store.player,{tx:data.player.c,ty:data.player.r,px:data.player.c*config.TILE,py:data.player.r*config.TILE,
             dir:data.player.dir,moving:false,step:0,stepT:0});
           store.scene=data.scene; store.animals=data.animals; store.eggs=data.eggs;
+          if(data.journey) store.journey=clone(data.journey);
           store.eggTimer=data.eggTimer; store.soundOn=data.soundOn;
           lastSaved=JSON.stringify(snapshot()); status='已儲存'; restored=true;
         }

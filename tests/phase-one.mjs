@@ -19,6 +19,7 @@ export function registerPhaseOneTests(format, options){
 
   check('shop welcome text fits measured bounds and preserves every character',api=>{
     for(const size of [[390,844],[844,390],[320,320],[1280,720]]){
+      api.game.store.journey.visited.shop=false;
       api.resize(...size); api.call('enterShop');
       const expected=api.get('dlg').text;
       let actual='';

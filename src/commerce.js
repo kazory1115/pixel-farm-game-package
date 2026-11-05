@@ -1,7 +1,11 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createCommerce = function ({ config, store, world, audio, dialogue, goals }) {
+  PixelFarm.createCommerce = function ({ config, store, world, clock, audio, dialogue, goals }) {
+    function openMarket(){
+      if(!clock.marketOpen()){ dialogue.notify('休市中 · 營業 08:00–18:00'); return; }
+      store.market.open=true; store.market.idx=0; store.market.msg=''; audio.sfx.cursor();
+    }
     function basePrice(id){ return id === 'egg' ? config.EGG_SELL : config.CROPS[id].sell; }
 
     function todayPrice(id){
@@ -20,7 +24,9 @@
       store.player.tx = 7; store.player.ty = 7; store.player.px = 7 * config.TILE; store.player.py = 7 * config.TILE;
       store.player.dir = 'up'; store.player.moving = false;
       audio.sfx.cursor();
-      dialogue.say('歡迎光臨種子商店！走到櫃台前按 A 買東西，往南走回門口就能出去');
+      const visited=store.journey.visited || (store.journey.visited={});
+      if(!visited.shop){ visited.shop=true; dialogue.say('歡迎光臨種子商店！走到櫃台前按 A 買東西，往南走回門口就能出去'); }
+      else store.dialogue.active=false;
     }
 
     function exitShop(){
@@ -75,6 +81,7 @@
     }
 
     function marketActivate(){
+      if(!clock.marketOpen()){ store.market.open=false; openMarket(); return; }
       var rows = marketRows();
       if (!rows.length){ store.market.open = false; return; }
       if (store.market.idx >= rows.length) store.market.idx = rows.length - 1;
@@ -91,6 +98,6 @@
       audio.sfx.coin(); goals.checkGoals();
     }
 
-    return { basePrice, todayPrice, priceBoardText, enterShop, exitShop, shopInteract, shopGoods, shopBuy, marketRows, marketActivate };
+    return { basePrice, todayPrice, priceBoardText, enterShop, exitShop, shopInteract, shopGoods, shopBuy, marketRows, marketActivate, openMarket };
   };
 })(window.PixelFarm);

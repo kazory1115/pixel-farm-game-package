@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createFarming = function ({ config, store, world, commerce, day, audio, dialogue, goals }) {
+  PixelFarm.createFarming = function ({ config, store, world, commerce, regions, day, audio, dialogue, goals }) {
     const waterEffects = [];
     function water(p,c,r){
       store.notice=null;
@@ -11,12 +11,14 @@
     }
     function interact(c, r){
       if (store.scene === 'shop'){ commerce.shopInteract(c, r); return; }
+      if (regions.interact(c,r)) return;
+      if (c===config.FARM_EXIT.c && r===config.FARM_EXIT.r){ regions.enterMarket(); return; }
       if (store.player.tx === config.SHOP_DOOR.c && store.player.ty === config.SHOP_DOOR.r){ commerce.enterShop(); return; }
       if (store.player.tx === config.DOOR.c && store.player.ty === config.DOOR.r){ day.sleep(); return; }
       if (c === config.DOOR.c && r === config.DOOR.r){ day.sleep(); return; }
       if (c === config.SCARECROW.c && r === config.SCARECROW.r){ dialogue.notify('稻草人阿伯今天也認真站崗中。'); return; }
       if (c === config.WELL.c && r === config.WELL.r){ dialogue.notify('井水冰冰涼涼的，光看著就消暑。'); return; }
-      if (world.isStall(c, r)){ store.market.open = true; store.market.idx = 0; store.market.msg = ''; audio.sfx.cursor(); return; }
+      if (world.isStall(c, r)){ commerce.openMarket(); return; }
       if (c === config.SIGN.c && r === config.SIGN.r){ dialogue.notify(commerce.priceBoardText()); return; }
       for (var i = 0; i < store.eggs.length; i++){
         if (store.eggs[i].c === c && store.eggs[i].r === r){

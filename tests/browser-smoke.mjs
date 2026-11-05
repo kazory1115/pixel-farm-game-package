@@ -4,14 +4,16 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import http from 'node:http';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
 import { pathToFileURL } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
 import { root, build } from '../scripts/build.mjs';
 
-const browser=process.env.BROWSER_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const directory=await fs.mkdtemp(path.join(os.tmpdir(),'pixel-farm-browser-'));
+const browser=process.env.BROWSER_PATH || (process.platform === 'linux' ? '/mnt/c/Program Files/Google/Chrome/Application/chrome.exe' : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe');
+const windowsBrowser=process.platform === 'linux' && browser.endsWith('.exe');
+const directory=await fs.mkdtemp(path.join(windowsBrowser ? root : os.tmpdir(),windowsBrowser ? '.browser-smoke-' : 'pixel-farm-browser-'));
+const browserPath=file=>windowsBrowser ? execFileSync('wslpath',['-w',file],{encoding:'utf8'}).trim() : file;
 const server=http.createServer(async (req,res) => {
   try {
     const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -24,7 +26,7 @@ const server=http.createServer(async (req,res) => {
 server.listen(0,'127.0.0.1'); await once(server,'listening');
 const child=spawn(browser,['--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check',
   '--disable-extensions','--disable-background-networking','--remote-debugging-port=0',
-  `--user-data-dir=${directory}`,'about:blank'],{windowsHide:true,stdio:'ignore'});
+  `--user-data-dir=${browserPath(directory)}`,'about:blank'],{windowsHide:true,stdio:'ignore'});
 let socket;
 try {
   let port;
@@ -75,11 +77,12 @@ try {
       const result=await evaluate(`(() => {
         const g=PixelFarm.game; g.surface.fitScreen(); g.store.scene='farm'; g.store.menu.open=false; g.store.shop.open=false;
         g.store.market.open=false; g.dialogue.say('歡迎來到像素農場！北邊有商店、南邊有市集，按 START 看說明');
-        g.store.dialogue.shown=999; document.getElementById('padbar').style.setProperty('--control-scale','${scale}');
+        g.store.dialogue.shown=999; document.getElementById('padbar').style.setProperty('--control-scale','${scale}'); g.surface.fitScreen();
         g.renderer.draw();
         const rect=g.surface.canvas.getBoundingClientRect();
         const bottom=rect.top+60/g.surface.view.height*rect.height;
-        return {bottom,top:rect.top+20/g.surface.view.height*rect.height,
+        const playerBottom=rect.top+(16+g.store.player.py+16-g.surface.view.camera.y)/g.surface.view.height*rect.height;
+        return {bottom,worldBottom:rect.bottom,playerBottom,top:rect.top+20/g.surface.view.height*rect.height,
           controls:[...document.querySelectorAll('.padbar button')].map(b=>{const r=b.getBoundingClientRect(); return {top:r.top,bottom:r.bottom,left:r.left,right:r.right};}),
           overflow:document.documentElement.scrollWidth>innerWidth || document.documentElement.scrollHeight>innerHeight};
       })()`);
@@ -87,9 +90,16 @@ try {
       for(const control of result.controls) {
         assert.ok(control.top>=result.bottom || control.bottom<=result.top,`${width}x${height} at ${scale}: controls overlap dialogue`);
         assert.ok(control.left>=0 && control.right<=width && control.top>=0 && control.bottom<=height);
+        assert.ok(control.bottom<=result.worldBottom,`${width}x${height}: controls must stay inside the screen`);
+        assert.ok(control.left>=24 && control.right<=width-24,`${width}x${height}: controls need a safe side margin`);
+        assert.ok(control.top>=result.playerBottom,`${width}x${height}: controls hide the player`);
       }
     }
-    if(width===390 || width===1280) await screenshot(`dialogue-${width}`);
+    if(width===390 || width===1280){
+      await screenshot(`dialogue-${width}`);
+      await evaluate("PixelFarm.game.dialogue.notify('小麥 +1');PixelFarm.game.renderer.draw()");
+      await screenshot(`notice-${width}`);
+    }
   }
   await send('Emulation.setDeviceMetricsOverride',{width:1280,height:720,deviceScaleFactor:1,mobile:false});
   const layers=await evaluate(`(() => {
@@ -120,6 +130,28 @@ try {
     const g=PixelFarm.game; g.store.farm.fertilizer=1; g.menu.toggleMenu(); g.renderer.draw();
   })()`);
   await screenshot('tools');
+  await evaluate(`(() => {
+    const g=PixelFarm.game; g.store.menu.open=false; g.store.dialogue.active=false; g.store.notice=null;
+    g.store.farm.sprinkler=true;
+    Object.assign(g.store.plotAt(2,9),{tilled:true,crop:'wheat',growth:0,watered:false});
+    Object.assign(g.store.plotAt(3,9),{tilled:true,crop:'wheat',growth:0,watered:true});
+    g.renderer.draw();
+  })()`);
+  await screenshot('watering-and-sprinkler');
+  await evaluate(`(() => {
+    const g=PixelFarm.game; g.regions.travel('market',11,7,'down'); g.store.journey.minute=780;
+    g.renderer.draw();
+  })()`);
+  await screenshot('market-day');
+  await evaluate('PixelFarm.game.store.journey.minute=1260;PixelFarm.game.renderer.draw()');
+  await screenshot('market-night');
+  await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+  await evaluate(`(() => {
+    const g=PixelFarm.game; g.surface.fitScreen(); g.store.menu.open=true; g.store.menu.tab=5; g.renderer.draw();
+  })()`);
+  await screenshot('map-mobile');
+  await send('Emulation.setDeviceMetricsOverride',{width:1280,height:720,deviceScaleFactor:1,mobile:false});
+  await evaluate('PixelFarm.game.regions.leaveMarket();PixelFarm.game.surface.fitScreen();PixelFarm.game.store.journey.minute=480');
   await evaluate(`(() => {
     const g=PixelFarm.game; g.store.menu.open=false;
     Object.assign(g.store.player,{tx:11,ty:4,px:176,py:64,dir:'right',moving:false});
@@ -167,7 +199,7 @@ try {
   await delay(60);
   assert.deepEqual(await evaluate('[PixelFarm.game.store.player.tx,PixelFarm.game.store.player.ty,PixelFarm.game.store.player.dir]'),[5,6,'left']);
   const standalone=await build(path.join(directory,'standalone'));
-  await send('Page.navigate',{url:pathToFileURL(standalone).href});
+  await send('Page.navigate',{url:windowsBrowser ? 'file:///' + browserPath(standalone).replaceAll('\\','/') : pathToFileURL(standalone).href});
   for(let i=0;i<100;i++) {
     if(await evaluate('location.protocol === "file:" && window.PixelFarm?.game?.startup.phase === "ready"')) break;
     await delay(100);

@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createPanels = function ({ config, store, surface, images, tools, menu, commerce, dialogue }) {
+  PixelFarm.createPanels = function ({ config, store, surface, images, tools, menu, commerce, dialogue, clock, regions, world }) {
     const view = surface.view;
     function panel(x, y, w, h){
       surface.px(x, y, w, h, '#28283c');
@@ -33,7 +33,13 @@
         if (store.farm.tool === 'seed') surface.txt('×' + store.farm.seeds[store.farm.seedCrop], view.width - 4, 12, '#f8f8f0', 'right');
       }
     }
-
+    function drawClock(){
+      if(store.dialogue.active || store.menu.open || store.shop.open || store.market.open) return;
+      surface.px(4,18,Math.min(view.width-8,139),12,'#303c38');
+      surface.ctx.font='7px sans-serif';
+      const place=store.scene==='market'?'河畔市集':store.scene==='shop'?'種子商店':'農場';
+      surface.txt(clock.label()+' '+place+' · '+(clock.marketOpen()?'開市':'休市'),8,27,'#f5e9c8');
+    }
     function drawNotice(){
       const notice=store.notice;
       if(!notice || Date.now()>=notice.until || store.dialogue.active || store.menu.open || store.market.open || store.shop.open) return;
@@ -49,6 +55,34 @@
       panel(4,33,width,lines.length*10+12);
       surface.ctx.font='7px sans-serif';
       lines.forEach((line,i)=>surface.txt(line,13,47+i*10,'#28283c'));
+    }
+    function drawMap(G){
+      const town=store.scene==='market',cols=town?config.TOWN.cols:config.COLS,rows=town?config.TOWN.rows:config.ROWS;
+      const scale=Math.min((G.W-20)/cols,(G.H-59)/rows),x=G.X+(G.W-cols*scale)/2,y=G.Y+29;
+      surface.ctx.font='7px sans-serif';
+      surface.txt('農場 ← 東側步道 → 河畔市集',G.X+G.W/2,G.Y+25,'#5a6243','center');
+      for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+        let color='#93ae68';
+        if(town){
+          if(c>=21) color='#5f9fbc';
+          else if(world.isSolidMarket(c,r)) color='#5f6952';
+          else if(r===8 || c>=4 && c<=19 && r>=4 && r<=12) color='#c8b58e';
+        } else {
+          if(world.isPond(c,r)) color='#5f9fbc';
+          else if(world.isPlot(c,r)) color='#ae8150';
+          else if(world.isSolid(c,r)) color='#5f6952';
+          else if(world.isPath(c,r)) color='#c8b58e';
+        }
+        surface.px(x+c*scale,y+r*scale,scale,scale,color);
+      }
+      const exit=town?config.TOWN.exit:config.FARM_EXIT;
+      surface.px(x+exit.c*scale,y+exit.r*scale,scale+1,scale+1,'#f7cc4e');
+      config.NPCS.filter(n=>n.scene===(town?'market':'farm')).forEach(n=>surface.px(x+n.c*scale,y+n.r*scale,scale+1,scale+1,'#cf6c73'));
+      const c=store.scene==='shop'?config.SHOP_DOOR.c:store.player.tx,r=store.scene==='shop'?config.SHOP_DOOR.r:store.player.ty;
+      surface.px(x+c*scale-1,y+r*scale-1,scale+2,scale+2,'#fff9d2');
+      surface.ctx.font='6px sans-serif';
+      surface.txt('白：你  黃：出口  粉：村民',G.X+G.W/2,G.Y+G.H-17,'#5a6243','center');
+      surface.txt('M / B 關閉 · ←→ 換頁',G.X+G.W/2,G.Y+G.H-6,'#6a675a','center');
     }
 
     function drawDialog(){
@@ -75,6 +109,7 @@
         if (i === store.menu.tab){ surface.px(tx0, Y + 2, tabW - 2, 14, '#28283c'); surface.txt(config.MENU_TABS[i], tx0 + tabW / 2, Y + 12, '#f8f8f0', 'center'); }
         else surface.txt(config.MENU_TABS[i], tx0 + tabW / 2, Y + 12, '#28283c', 'center');
       }
+      if(store.menu.tab===5){ drawMap(G); return; }
       var items = menu.menuItems();
       var rowH = menuRowHeight();
       var VIS = Math.max(1, Math.floor((H - 28) / rowH));
@@ -139,6 +174,6 @@
       surface.txt(store.market.msg || 'A 賣出 · B 離開 · 價格每天會變', X + W / 2, Y + H - 5, store.market.msg ? '#a4443c' : '#6a675a', 'center');
     }
 
-    return { panel, panelGeom, menuRowHeight, drawHUD, drawNotice, drawDialog, drawMenu, drawShopPanel, drawMarketPanel };
+    return { panel, panelGeom, menuRowHeight, drawHUD, drawClock, drawNotice, drawDialog, drawMenu, drawShopPanel, drawMarketPanel };
   };
 })(window.PixelFarm);

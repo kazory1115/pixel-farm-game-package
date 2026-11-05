@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createMenu = function ({ config, store, tools, day, audio, goals, persistence, window, document }) {
+  PixelFarm.createMenu = function ({ config, store, tools, day, regions, clock, audio, goals, persistence, window, document }) {
     const controlSizes = [80, 100, 120, 140];
     const storageKey = 'pixelFarm.controlSize';
     let controlSizeIndex = 1;
@@ -40,7 +40,7 @@
         return rows;
       }
       if (store.menu.tab === 2){
-        return goals.bundleRows().concat(goals.items.map(function(g){
+        return goals.bundleRows().concat(regions.journalRows()).concat(goals.items.map(function(g){
           return { label: (store.farm.goalsDone[g.id] || g.test() ? '✓ ' : '・') + g.text, info: true };
         }));
       }
@@ -64,6 +64,9 @@
           '雞會下蛋，撿蛋也能賣'
         ].map(function(s){ return { label: s, info: true }; });
       }
+      if(store.menu.tab===5) return [{label:'農場 → 東側步道 → 河畔市集',info:true},
+        {label:'市集交易 08:00–18:00',info:true},
+        {label:'現在 '+clock.label()+' · '+(store.scene==='market'?'河畔市集':'農場'),info:true}];
       return [
         { label:'回小屋睡覺', action:'sleep' },
         { label:'音效：' + (store.soundOn ? '開' : '關'), action:'sound' },

@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createWorldView = function ({ config, store, world, surface, images }) {
+  PixelFarm.createWorldView = function ({ config, store, world, surface, images, regions }) {
     const view = surface.view;
     function drawFigure(cx, by, cap, body){
       surface.px(cx - 4, by - 15, 8, 6, '#f2c894');            /* 臉 */
@@ -40,7 +40,7 @@
       surface.px(sx + 7, sy + 4, 2, 12, '#7a4a21');
       surface.px(sx, sy - 4, 18, 10, '#7a4a21');
       surface.ctx.font = '6px "PingFang TC","Microsoft JhengHei",sans-serif';
-      if (!store.menu.open && !store.market.open) surface.txt('市集', sx + 9, sy + 3, '#c9ab78', 'center');
+      if (!store.menu.open && !store.market.open) surface.txt('集貨', sx + 9, sy + 3, '#c9ab78', 'center');
     }
 
     function drawShopInterior(){
@@ -92,7 +92,7 @@
     }
 
     function computeCam(){
-      var ww = config.COLS * config.TILE, wh = config.ROWS * config.TILE;
+      var ww = (store.scene==='market'?config.TOWN.cols:config.COLS) * config.TILE, wh = (store.scene==='market'?config.TOWN.rows:config.ROWS) * config.TILE;
       /* 視野比世界小：攝影機跟隨玩家並夾在世界內；視野比世界大：世界置中，邊界外由草地延伸填滿 */
       view.camera.x = view.width >= ww ? (ww - view.width) / 2 : Math.max(0, Math.min(ww - view.width, store.player.px + 8 - view.width / 2));
       var safeHeight=view.worldHeight-surface.controlInset;
@@ -223,6 +223,65 @@
       surface.drawFit(images.item_sprinkler, 9 * config.TILE + 8, 10 * config.TILE + 14, 18);
     }
 
-    return { drawFigure, drawShopBuilding, drawMarket, drawShopInterior, computeCam, drawHouse, drawTree, drawFences, drawPlot, drawCropPlant, drawWaterStatus, drawSprinkler };
+    function drawNPC(npc){
+      surface.drawFit(images[npc.sprite],npc.c*config.TILE+8,(npc.r+1)*config.TILE,23);
+      if(Math.hypot(npc.c*16-store.player.px,npc.r*16-store.player.py)>40) return;
+      surface.ctx.font='6px sans-serif';
+      surface.txt(npc.name,npc.c*config.TILE+8,npc.r*config.TILE-9,'#fff4ca','center');
+      if(npc.crop && store.journey.quests[npc.id]!=='done'){
+        surface.px(npc.c*config.TILE+6,npc.r*config.TILE-23,5,8,'#403c32');
+        surface.txt(store.journey.quests[npc.id] ? '?' : '!',npc.c*config.TILE+8,npc.r*config.TILE-16,'#ffdc69','center');
+      }
+    }
+    function drawExit(c,r,label){
+      surface.px(c*16+2,r*16-4,13,9,'#765134');
+      surface.px(c*16+3,r*16-3,11,7,'#d9bf92');
+      surface.ctx.font='6px sans-serif';
+      surface.txt(label,c*16+8,r*16+2,'#503b2b','center');
+    }
+    function drawTown(){
+      computeCam();
+      surface.ctx.save();
+      surface.ctx.beginPath(); surface.ctx.rect(0,16,view.width,view.worldHeight); surface.ctx.clip();
+      surface.ctx.translate(-view.camera.x,16-view.camera.y);
+      const c0=Math.floor(view.camera.x/16),r0=Math.floor(view.camera.y/16);
+      for(let r=r0;r<=(view.camera.y+view.worldHeight)/16;r++) for(let c=c0;c<=(view.camera.x+view.width)/16;c++){
+        const water=c>=21 && c<24 && r>=0 && r<16;
+        const plaza=c>=4 && c<=19 && r>=4 && r<=12;
+        const path=r===8 && c>=0 && c<=20 || c===20 && r>=5 && r<=13 || plaza && (r===6 || c===10);
+        surface.drawTileFlat(water ? images.tile_water : path ? images.tile_stone : plaza ? images.tile_sand : images.tile_grass2,c,r);
+      }
+      for(let c=1;c<21;c+=2){ drawTree(c,1); drawTree(c,15); }
+      surface.drawFit(images.shop_plant,4*16+8,12*16,20);
+      surface.drawFit(images.shop_plant,19*16+8,11*16,20);
+      config.TOWN.stalls.filter((_,i)=>i%2===0).forEach(function(s,i){
+        const x=s.c*16,y=s.r*16;
+        surface.px(x+1,y-12,3,27,'#7a4a21'); surface.px(x+28,y-12,3,27,'#7a4a21');
+        surface.px(x,y+6,32,9,'#a4713a');
+        for(let stripe=0;stripe<4;stripe++) surface.px(x+stripe*8,y-13,8,6,stripe%2?'#f5f0e6':['#d9534a','#578268','#c38a39'][i]);
+        surface.drawFit(images[['item_basket','item_crate','item_seeds'][i]],x+16,y+5,13);
+        surface.drawFit(images.shopkeeper,x+16,y+1,20);
+      });
+      const board=config.TOWN.board;
+      surface.px(board.c*16+7,board.r*16,2,16,'#765134');
+      surface.px(board.c*16-4,board.r*16-5,24,17,'#765134');
+      surface.px(board.c*16-2,board.r*16-3,20,13,'#ead6a9');
+      surface.ctx.font='6px sans-serif'; surface.txt('告示板',board.c*16+8,board.r*16+6,'#503b2b','center');
+      if(store.journey.forageDay!==store.farm.day) surface.drawFit(images.item_seeds,20*16+8,13*16,13);
+      surface.px(18*16,12*16+4,31,5,'#8b633b');
+      surface.px(18*16+2,12*16+9,3,6,'#6c492d'); surface.px(19*16+10,12*16+9,3,6,'#6c492d');
+      surface.ctx.font='6px sans-serif'; surface.txt('休息',19*16,12*16+1,'#f8eccf','center');
+      drawExit(1,7,'←農場');
+      surface.ctx.font='7px sans-serif'; surface.txt('河 畔 市 集',12*16,3*16,'#4d4b31','center');
+      const figures=regions.npcs().map(n=>({y:(n.r+1)*16,npc:n}));
+      figures.push({y:store.player.py+15,player:true}); figures.sort((a,b)=>a.y-b.y);
+      figures.forEach(e=>{
+        if(e.npc) drawNPC(e.npc);
+        else surface.drawFit(images['farmer_'+store.player.dir+'_'+(store.player.moving?[0,1,2,1][store.player.step]:1)],store.player.px+8,store.player.py+15,22);
+      });
+      surface.ctx.restore();
+    }
+
+    return { drawFigure, drawShopBuilding, drawMarket, drawShopInterior, computeCam, drawHouse, drawTree, drawFences, drawPlot, drawCropPlant, drawWaterStatus, drawSprinkler, drawNPC, drawExit, drawTown };
   };
 })(window.PixelFarm);

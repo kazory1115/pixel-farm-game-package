@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createPlayer = function ({ config, store, world, animals, commerce, audio, dialogue, goals }) {
+  PixelFarm.createPlayer = function ({ config, store, world, animals, commerce, regions, audio, dialogue, goals }) {
     let turning = false;
     let pendingStep = null;
     function cancelPendingStep(){ pendingStep=null; }
@@ -36,6 +36,8 @@
     }
 
     function onArrive(){
+      if(regions.arrive()) return;
+      if(store.scene==='market') return;
       if (store.scene === 'shop'){
         if (store.player.tx === 7 && store.player.ty === 8) commerce.exitShop();
         return;

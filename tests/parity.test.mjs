@@ -11,6 +11,7 @@ import { registerStartupTests } from './startup.mjs';
 import { registerFieldTests } from './field-test-fixes.mjs';
 import { registerSaveAndTurnTests } from './save-and-turn.mjs';
 import { registerPhaseOneTests } from './phase-one.mjs';
+import { registerExplorationTests } from './exploration.mjs';
 
 const baseline = JSON.parse(fs.readFileSync(new URL('fixtures/legacy-baseline.json', import.meta.url)));
 const fieldRenders = JSON.parse(fs.readFileSync(new URL('fixtures/phase-one-render-baseline.json', import.meta.url)));
@@ -55,7 +56,7 @@ for(const [name,scenario] of Object.entries(scenarios)) {
         assert.equal(settings.items[2].action,'save');
         settings.items.splice(2,1);
         assert.equal(result[2].items[0].label,'田園出貨套組');
-        result[2].items.splice(0,7);
+        result[2].items.splice(0,12);
       }
       if (name === 'render parity across viewports scenes and overlays') {
         assert.deepEqual(result,fieldRenders[name]);
@@ -101,6 +102,8 @@ registerSaveAndTurnTests('development', {});
 registerSaveAndTurnTests('standalone', { htmlPath:exported });
 registerPhaseOneTests('development', {});
 registerPhaseOneTests('standalone', { htmlPath:exported });
+registerExplorationTests('development', {});
+registerExplorationTests('standalone', { htmlPath:exported });
 
 test('game markup and image bytes are preserved around the control settings', async () => {
   const runtime=await loadGame();

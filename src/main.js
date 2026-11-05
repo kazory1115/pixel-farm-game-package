@@ -8,6 +8,7 @@
     const assets = PixelFarm.createAssets({ ImageType:window.Image, setTimeout:window.setTimeout.bind(window), clearTimeout:window.clearTimeout.bind(window) });
     const images = assets.images;
     const world = PixelFarm.createWorld({ config, store });
+    const clock = PixelFarm.createClock({store});
     const audio = PixelFarm.createAudio({ store, window });
     const surface = PixelFarm.createSurface({ config, window, document });
     const dialogue = PixelFarm.createDialogue({ store, audio, view: surface.view, measureText:surface.measureText });
@@ -15,14 +16,15 @@
     const tools = PixelFarm.createTools({ config, store, audio });
     const animals = PixelFarm.createAnimals({ config, store, world });
     const persistence = PixelFarm.createPersistence({ config, store, world, window, document });
-    const commerce = PixelFarm.createCommerce({ config, store, world, audio, dialogue, goals });
-    const player = PixelFarm.createPlayer({ config, store, world, animals, commerce, audio, dialogue, goals });
-    const day = PixelFarm.createDayCycle({ config, store, animals, audio, dialogue, goals, persistence, document, setTimeout: window.setTimeout.bind(window) });
-    const farming = PixelFarm.createFarming({ config, store, world, commerce, day, audio, dialogue, goals });
-    const menu = PixelFarm.createMenu({ config, store, tools, day, audio, goals, persistence, window, document });
-    const worldView = PixelFarm.createWorldView({ config, store, world, surface, images });
-    const panels = PixelFarm.createPanels({ config, store, surface, images, tools, menu, commerce, dialogue });
-    const renderer = PixelFarm.createRenderer({ config, store, world, player, farming, surface, worldView, panels, images });
+    const commerce = PixelFarm.createCommerce({ config, store, world, clock, audio, dialogue, goals });
+    const regions = PixelFarm.createRegions({config,store,clock,commerce,dialogue,audio});
+    const player = PixelFarm.createPlayer({ config, store, world, animals, commerce, regions, audio, dialogue, goals });
+    const day = PixelFarm.createDayCycle({ config, store, clock, regions, animals, audio, dialogue, goals, persistence, document, setTimeout: window.setTimeout.bind(window) });
+    const farming = PixelFarm.createFarming({ config, store, world, commerce, regions, day, audio, dialogue, goals });
+    const menu = PixelFarm.createMenu({ config, store, tools, day, regions, clock, audio, goals, persistence, window, document });
+    const worldView = PixelFarm.createWorldView({ config, store, world, surface, images, regions });
+    const panels = PixelFarm.createPanels({ config, store, surface, images, tools, menu, commerce, dialogue, clock, regions, world });
+    const renderer = PixelFarm.createRenderer({ config, store, world, clock, player, farming, surface, worldView, panels, images });
     const input = PixelFarm.createInput({ config, store, surface, panels, player, farming, tools, menu, commerce, dialogue, audio, window, document });
     const startup = PixelFarm.createStartup({ window, document });
     const welcomeText = '歡迎來到像素農場！北邊有商店、南邊有市集，按 START 看說明';
@@ -39,6 +41,7 @@
         if (store.menu.open || store.shop.open || store.market.open) { player.cancelPendingStep(); }
         else if (store.dialogue.active){ player.cancelPendingStep(); dialogue.updateDialog(dt); }
         else {
+          if(document.visibilityState !== 'hidden') clock.update(dt);
           player.updatePlayer(dt);
           if (store.scene === 'farm') animals.updateAnimals(dt);
         }
@@ -78,6 +81,6 @@
       return pendingStart;
     }
 
-    return { start, store, world, audio, dialogue, goals, tools, animals, commerce, player, day, farming, menu, surface, panels, renderer, input, startup, persistence };
+    return { start, store, world, clock, regions, audio, dialogue, goals, tools, animals, commerce, player, day, farming, menu, surface, panels, renderer, input, startup, persistence };
   };
 })(window.PixelFarm);

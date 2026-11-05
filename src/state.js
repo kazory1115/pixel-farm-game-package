@@ -19,6 +19,7 @@
     }
     return {
       farm, plots, plotAt,
+      journey: { minute:480, quests:{}, forageDay:0, talked:{}, visited:{} },
       player: { tx:5, ty:6, px:5*config.TILE, py:6*config.TILE, dir:'down', moving:false, step:0, stepT:0 },
       dialogue: { text:'', shown:0, active:false, t:0, pageStart:0 },
       menu: { open:false, tab:0, idx:0, top:0 },

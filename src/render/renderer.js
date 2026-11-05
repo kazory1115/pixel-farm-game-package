@@ -1,10 +1,21 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createRenderer = function ({ config, store, world, player, farming, surface, worldView, panels, images }) {
+  PixelFarm.createRenderer = function ({ config, store, world, clock, player, farming, surface, worldView, panels, images }) {
     const view = surface.view;
     function draw(){
       surface.textQueue.length = 0;
+      if(store.scene==='market'){
+        surface.px(0,0,view.width,view.height,'#79a83e');
+        worldView.drawTown(); surface.present(true);
+        surface.ctx.clearRect(0,0,view.width,view.height);
+        drawTimeTint();
+        panels.drawHUD(); panels.drawClock(); panels.drawNotice();
+        if(store.menu.open) panels.drawMenu();
+        else if(store.market.open) panels.drawMarketPanel();
+        else if(store.dialogue.active) panels.drawDialog();
+        surface.present(); return;
+      }
       if (store.scene === 'shop'){
         surface.px(0, 0, view.width, view.height, '#3a2a18'); /* 先鋪滿深木色：室內置中後四周不留殘影/空白 */
         surface.px(0, 0, view.width, 16, '#20242c');
@@ -12,7 +23,8 @@
         surface.present(true);
         surface.ctx.clearRect(0, 0, view.width, view.height);
         panels.drawHUD();
-      panels.drawNotice();
+        panels.drawClock();
+        panels.drawNotice();
         if (store.menu.open) panels.drawMenu();
         else if (store.shop.open) panels.drawShopPanel();
         else if (store.dialogue.active) panels.drawDialog();
@@ -68,9 +80,11 @@
       worldView.drawShopBuilding();
       worldView.drawMarket();
       worldView.drawSprinkler();
+      worldView.drawExit(26,5,'市集→');
       worldView.drawFences();
       store.eggs.forEach(function(e){ surface.drawFit(images.item_egg, e.c * config.TILE + 8, e.r * config.TILE + 15, 11); });
       var ents = store.animals.map(function(a){ return { y: a.y, a: a }; });
+      config.NPCS.filter(n=>n.scene==='farm').forEach(n=>ents.push({y:(n.r+1)*config.TILE,npc:n}));
       ents.push({ y: store.player.py + 8, p: true });
       ents.push({ y: (config.SCARECROW.r + 1) * config.TILE, deco: 'deco_scarecrow', c: config.SCARECROW.c, r: config.SCARECROW.r, h: 24 });
       ents.push({ y: (config.WELL.r + 1) * config.TILE, deco: 'deco_well', c: config.WELL.c, r: config.WELL.r, h: 24 });
@@ -78,7 +92,8 @@
       config.TREES.forEach(function(t){ ents.push({ y: (t.r + 1) * config.TILE, tree: t }); });
       ents.sort(function(m, n){ return m.y - n.y; });
       ents.forEach(function(e){
-        if (e.p){
+        if(e.npc){ worldView.drawNPC(e.npc); }
+        else if (e.p){
           var frames = [0, 1, 2, 1];
           var fi = store.player.moving ? frames[store.player.step] : 1;
           surface.drawFit(images['farmer_' + store.player.dir + '_' + fi], store.player.px + 8, store.player.py + 15, 22);
@@ -119,12 +134,21 @@
       surface.px(0, 16, view.width, view.worldHeight, 'rgba(255,166,66,.05)'); /* 農場整體罩一層暖色，跟商店室內的暖木色調統一 */
       surface.present(true);
       surface.ctx.clearRect(0, 0, view.width, view.height);
+      drawTimeTint();
       panels.drawHUD();
+      panels.drawClock();
       panels.drawNotice();
       if (store.menu.open) panels.drawMenu();
       else if (store.market.open) panels.drawMarketPanel();
       else if (store.dialogue.active) panels.drawDialog();
       surface.present();
+    }
+    function drawTimeTint(){
+      const tint=clock.tint();
+      if(!tint.alpha) return;
+      surface.ctx.save(); surface.ctx.globalAlpha=tint.alpha;
+      surface.px(0,16,view.width,view.worldHeight,tint.color);
+      surface.ctx.restore();
     }
 
     return { draw };

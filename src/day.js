@@ -1,7 +1,7 @@
 (function (PixelFarm) {
   "use strict";
 
-  PixelFarm.createDayCycle = function ({ config, store, animals, audio, dialogue, goals, persistence, document, setTimeout }) {
+  PixelFarm.createDayCycle = function ({ config, store, clock, regions, animals, audio, dialogue, goals, persistence, document, setTimeout }) {
     const el = id => document.getElementById(id);
     function sleep(){
       if (store.sleeping) return;
@@ -11,6 +11,8 @@
       el('nightfade').className = 'nightfade on';
       setTimeout(function(){
         store.farm.day++;
+        clock.reset();
+        if(store.scene==='market') regions.travel('farm',3,4,'down');
         store.farm.rainy = Math.random() < 0.28;
         for (var k in store.plots){
           var p = store.plots[k];
