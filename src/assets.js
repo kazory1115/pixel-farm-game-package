@@ -71,16 +71,11 @@
       onProgress(0, names.length);
 
       const tasks = names.map(function (name) {
-        const image = new ImageType();
-        images[name] = image;
-        image.decoding = 'async';
         return new Promise(function (resolve, reject) {
-          let settled = false;
-          let decoding = false;
+          let settled = false, attempts = 0, image;
           const cleanup = function () {
             clearTimeout(timer);
-            image.onload = null;
-            image.onerror = null;
+            if (image){ image.onload = null; image.onerror = null; }
           };
           const finish = function (error) {
             if (settled) return;
@@ -88,30 +83,44 @@
             cleanup();
             if (error) reject(error);
             else {
+              images[name] = image;
               completed++;
               if (!failed) onProgress(completed, names.length);
               resolve(image);
             }
           };
+          // One total deadline also covers retries; progress counts assets, not attempts.
           const timer = setTimeout(function () {
             finish(new Error('圖片載入逾時：' + name));
           }, 30000);
-          cleanups.push(cleanup);
-          image.onerror = function () { finish(new Error('無法載入圖片：' + name)); };
-          image.onload = function () {
-            if (decoding || settled) return;
-            decoding = true;
-            if (!image.naturalWidth) { image.onerror(); return; }
-            // complete only describes loading; decode keeps the first draw from
-            // having to synchronously decode all the source PNGs.
-            Promise.resolve().then(function () {
-              return typeof image.decode === 'function' ? image.decode() : undefined;
-            }).then(function () { finish(); }, function () {
-              finish(new Error('無法解碼圖片：' + name));
-            });
-          };
-          image.src = PixelFarm.assetSources[name];
-          if (image.complete) image.onload();
+          cleanups.push(function(){ settled = true; cleanup(); });
+          function attempt(){
+            if (settled || failed) return;
+            attempts++;
+            const current = image = new ImageType();
+            current.decoding = 'async';
+            let decoding = false;
+            function retry(error){
+              if (settled || current !== image) return;
+              current.onload = null; current.onerror = null;
+              if (attempts < 3) attempt();
+              else finish(error);
+            }
+            current.onerror = function () { retry(new Error('無法載入圖片：' + name)); };
+            current.onload = function () {
+              if (decoding || settled || current !== image) return;
+              decoding = true;
+              if (!current.naturalWidth){ retry(new Error('無法載入圖片：' + name)); return; }
+              Promise.resolve().then(function () {
+                return typeof current.decode === 'function' ? current.decode() : undefined;
+              }).then(function () {
+                if (current === image) finish();
+              }, function () { retry(new Error('無法解碼圖片：' + name)); });
+            };
+            current.src = PixelFarm.assetSources[name];
+            if (current.complete && current.naturalWidth) current.onload();
+          }
+          attempt();
         });
       });
       pending = Promise.all(tasks).catch(function (error) {

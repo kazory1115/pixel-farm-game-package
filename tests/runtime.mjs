@@ -14,6 +14,8 @@ export async function loadGame({ legacyPath, htmlPath = path.join(root, entry), 
   const events = new Map();
   const timeouts = new Map();
   const imageElements = [];
+  const imageAttempts = new Map();
+  const waterHash = digest(fs.readFileSync(path.join(root,'assets/game/tile_water.png')));
   const fontRequests = [];
   const fontResolvers = [];
   const links = [];
@@ -36,6 +38,10 @@ export async function loadGame({ legacyPath, htmlPath = path.join(root, entry), 
         if (key === 'reset') return () => { props = { ...initial }; transform = { a:1, d:1, e:0, f:0 }; stack = []; };
         if (key in props) return props[key];
         if (key === 'getTransform') return () => ({ ...transform });
+        if (key === 'measureText') return text => {
+          const size = Number(/([\d.]+)px/.exec(props.font)?.[1] || 10);
+          return { width:Array.from(String(text)).reduce((sum,c) => sum + (c.charCodeAt(0) > 255 ? size : size * .6),0) };
+        };
         return (...args) => {
           if (key === 'save') stack.push({ props:{ ...props }, transform:{ ...transform } });
           if (key === 'restore' && stack.length) ({ props, transform } = stack.pop());
@@ -79,10 +85,12 @@ export async function loadGame({ legacyPath, htmlPath = path.join(root, entry), 
       this.source = value;
       const bytes = value.startsWith('data:') ? Buffer.from(value.split(',')[1], 'base64') : fs.readFileSync(path.join(root, value));
       this.imageHash = digest(bytes);
+      this.attempt = (imageAttempts.get(this.imageHash) || 0) + 1;
+      imageAttempts.set(this.imageHash,this.attempt);
       this.size = [bytes.readUInt32BE(16),bytes.readUInt32BE(20)];
       this.naturalWidth = this.naturalHeight = 0;
       this.complete = false;
-      if (imageMode === 'error') queueMicrotask(() => { this.complete=true; this.onerror?.(); });
+      if (imageMode === 'error' || (imageMode === 'transient-error' && this.imageHash === waterHash && this.attempt === 1)) queueMicrotask(() => { this.complete=true; this.onerror?.(); });
       else if (imageMode !== 'deferred') this.finishLoading(false);
     }
     get src() { return this.source; }
@@ -92,6 +100,7 @@ export async function loadGame({ legacyPath, htmlPath = path.join(root, entry), 
       if (emit) this.onload?.();
     }
     decode() {
+      if (imageMode === 'transient-decode-error' && this.imageHash === waterHash && this.attempt === 1) return Promise.reject(new Error('transient decode failure'));
       if (imageMode === 'decode-error') return Promise.reject(new Error('decode failed'));
       if (imageMode === 'decode-deferred') return new Promise(resolve => { this.finishDecode=resolve; });
       return Promise.resolve();

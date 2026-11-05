@@ -17,7 +17,8 @@ export function registerStartupTests(format, options) {
   });
 
   check('waits for every image before binding controls or scheduling play', { waitForStart:false, imageMode:'deferred' }, async api => {
-    assert.equal(api.imageElements.length,54);
+    const total=Object.keys(api.sandbox.PixelFarm.assetSources).length;
+    assert.equal(api.imageElements.length,total);
     assert.equal(api.pendingFrames(),0);
     assert.equal(api.game.start(),api.ready);
     api.emit('btnA','click'); api.key('Enter'); api.emit('dpad-down','pointerdown');
@@ -27,7 +28,7 @@ export function registerStartupTests(format, options) {
     for (const image of api.imageElements.slice(0,-1)) image.finishLoading();
     await flush();
     assert.equal(api.pendingFrames(),0);
-    assert.equal(api.sandbox.document.getElementById('loadProgress').value,53);
+    assert.equal(api.sandbox.document.getElementById('loadProgress').value,total-1);
     api.imageElements.at(-1).finishLoading();
     assert.equal(await api.ready,true);
     assert.equal(api.pendingFrames(),1);
